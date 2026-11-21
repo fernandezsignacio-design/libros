@@ -70,10 +70,11 @@ code{font-size:13px;word-break:break-all}
 <div id="vs" class="setup" hidden>
  <img src="icon-192.png" alt="">
  <div class="panel"><h2>Conectar con tu Google Sheets</h2>
- <form id="fs"><input id="su" placeholder="Enlace de la app web (termina en /exec)" required autocomplete="off">
- <input id="sk" placeholder="Clave" autocomplete="off">
+ <p class="stats" style="margin:0 0 10px">Lo hacés una sola vez en cada dispositivo. Copiá el código de conexión y tocá el botón verde.</p>
+ <button type="button" id="spaste" class="scanbig">📋 Pegar código y conectar</button>
+ <form id="fs"><textarea id="su" rows="3" placeholder="…o pegalo acá a mano" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="font:inherit;font-size:15px;padding:12px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);width:100%"></textarea>
  <div class="row"><button class="pri">Conectar</button></div></form>
- <p class="stats" id="se">Lo hacés una sola vez en cada dispositivo. Si tenés el código de conexión completo (enlace#clave), pegalo en el primer campo.</p></div>
+ <p class="stats" id="se"></p></div>
 </div>
 
 <div id="va" hidden>
@@ -154,13 +155,20 @@ function toast(t,err){const el=$("toast");el.textContent=t;el.classList.toggle("
 
 /* ---------- configuración ---------- */
 function showApp(){$("vs").hidden=!!cfg;$("va").hidden=!cfg;if(cfg){$("code").textContent=cfg.u+"#"+cfg.k;refresh();load()}}
-$("fs").onsubmit=async e=>{e.preventDefault();let u=$("su").value.trim(),k=$("sk").value.trim();
- if(u.includes("#")){[u,k]=[u.split("#")[0],u.split("#").slice(1).join("#")]}
- if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(u)){$("se").textContent="El enlace tiene que empezar con https://script.google.com/";return}
- if(!k){$("se").textContent="Falta la clave.";return}
- $("se").textContent="Probando la conexión…";cfg={u,k};
- try{const b=await api();store.set("cfg",cfg);setBooks(b);showApp()}
- catch(x){cfg=null;$("se").textContent="No funcionó: revisá el enlace y la clave. ("+x.message+")"}};
+// Acepta el código en cualquier forma: "enlace#clave", el enlace y la clave separados, o un texto más largo que los contenga.
+function parseCode(txt){txt=String(txt||"");try{txt=decodeURIComponent(txt)}catch(e){}
+ const u=(txt.match(/https:\/\/script\.google(?:usercontent)?\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec/)||[])[0];
+ const k=(txt.match(/\/exec[#\s?&=k]*([A-Za-z0-9]{12,})/)||txt.match(/(?:clave|key)\W*([A-Za-z0-9]{12,})/i)||[])[1];
+ return u&&k?{u,k}:null}
+async function connect(txt){const c=parseCode(txt);
+ if(!c){$("se").textContent="Ese texto no tiene el código de conexión. Copiá el código completo (empieza con https://script.google.com y termina con #… ) y probá de nuevo.";return false}
+ $("se").textContent="Probando la conexión…";cfg=c;
+ try{const b=await api();store.set("cfg",cfg);setBooks(b);showApp();return true}
+ catch(x){cfg=null;$("se").textContent="No funcionó: revisá el código. ("+x.message+")";return false}}
+$("fs").onsubmit=e=>{e.preventDefault();connect($("su").value)};
+$("spaste").onclick=async()=>{let t="";try{t=await navigator.clipboard.readText()}catch(e){}
+ if(!t){$("se").textContent="No pude leer lo copiado. Mantené apretado el cuadro de abajo, elegí «Pegar» y tocá Conectar.";$("su").focus();return}
+ $("su").value=t;connect(t)};
 $("cfg").onclick=()=>{$("sp").hidden=!$("sp").hidden;$("ap").hidden=true};
 $("sx").onclick=()=>$("sp").hidden=true;
 $("rs").onclick=()=>{$("sp").hidden=true;load()};
@@ -280,7 +288,8 @@ $("fi").onclick=async()=>{if(fiRun){fiRun=false;return}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&cfg&&Date.now()-store.get("at",0)>60000)load()});
 window.addEventListener("online",load);
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
-showApp();
+(async()=>{const h=location.hash;showApp();if(h.startsWith("#conectar=")&&!cfg){history.replaceState(null,"",location.pathname);
+ if(await connect(h.slice(10)))toast("✔ Conectado con tu Google Sheets")}else if(h.startsWith("#conectar="))history.replaceState(null,"",location.pathname)})();
 /* ---------- código de barras e ISBN ---------- */
 const GEN={"Novela":"Ficción","Policial y suspenso":"Ficción","Novela histórica":"Ficción","Cuentos":"Ficción","Guion y teatro":"Ficción",
  "Memorias y autobiografía":"No ficción","Biografía":"No ficción","Crónica y periodismo":"No ficción","Literatura de viajes":"No ficción","Historia":"No ficción",
