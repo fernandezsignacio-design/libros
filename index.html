@@ -4,8 +4,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mis libros leídos</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mis libros">
@@ -74,51 +74,72 @@ code{font-size:13px;word-break:break-all}
 .tabs .add.on{color:var(--bg);background:var(--ac);outline:3px solid var(--bd)}
 body.kb .tabs{display:none}
 .seg{display:flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden}.seg button{flex:1;border:none;border-radius:0;padding:10px 6px}.seg button+button{border-left:1px solid var(--bd)}
+button,select,input:not([type=checkbox]){min-height:44px}
+td button[data-del]{min-height:36px;min-width:36px;padding:4px 8px;margin-left:4px}
+.snack{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0));z-index:45;width:min(calc(100% - 24px),520px);display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:var(--tx);color:var(--bg);box-shadow:0 8px 24px rgba(0,0,0,.25);font-weight:600;font-size:15px}
+body.nav .snack{bottom:calc(92px + env(safe-area-inset-bottom,0))}body.kb .snack{bottom:calc(12px + env(safe-area-inset-bottom,0))}
+.snack.err{background:var(--no);color:#fff}.snack span{flex:1}.snack button{background:none;border:none;color:inherit;text-decoration:underline;font-weight:700;padding:6px 4px;min-height:40px}
+#prog{position:fixed;top:0;left:0;right:0;height:3px;z-index:60;background:linear-gradient(90deg,transparent,var(--ac),transparent);background-size:50% 100%;background-repeat:no-repeat;animation:prog 1s linear infinite}
+@keyframes prog{from{background-position:-50% 0}to{background-position:150% 0}}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:gira .7s linear infinite;vertical-align:-2px;margin-right:6px}@keyframes gira{to{transform:rotate(360deg)}}
+.qr{width:min(70vw,240px);margin:12px auto;background:#fff;padding:6px;border-radius:12px}
+details summary{cursor:pointer;padding:8px 0}
+.pl h3{font-size:15px;margin:14px 0 6px}.bk{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:8px 10px 8px 14px;margin:6px 0}
+.bk div{flex:1;min-width:0}.bk b{display:block}.bk span{color:var(--mut);font-size:13px}.bk button{flex:0 0 auto}
+.pend td,.bk.pend{opacity:.65}.chip{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--bd);color:var(--mut);margin-left:6px;vertical-align:1px}
+.verdict.info{background:var(--bd);color:var(--tx)}
 </style></head><body><main>
+<div id="prog" hidden></div>
+<div id="toast" class="snack" role="status" aria-live="polite" hidden><span id="tt"></span><button type="button" id="ta" hidden></button></div>
 
 <div id="pop" class="pop" hidden></div>
 <div id="sc" class="sc" hidden><video id="sv" playsinline muted></video><div class="fr"></div><p id="sm">Apuntá al código de barras de la contratapa</p><div class="row"><button type="button" id="sph">📸 Sacar foto</button><button type="button" id="scx">Cancelar</button></div></div>
 <input id="sf" type="file" accept="image/*" capture="environment" hidden>
 <div id="vs" class="setup" hidden>
- <img src="icons/icon-192.png" alt="">
+ <img src="icon-192.png" alt="">
  <div class="panel"><h2>Conectar con tu Google Sheets</h2>
  <p class="stats" style="margin:0 0 10px">Lo hacés una sola vez en cada dispositivo. Copiá el código de conexión y tocá el botón verde.</p>
- <button type="button" id="spaste" class="scanbig">📋 Pegar código y conectar</button>
+ <button type="button" id="sqr" class="scanbig">📷 Escanear el QR de otro dispositivo</button>
+ <p class="stats" style="margin:0 0 10px">En el dispositivo que ya está conectado: Ajustes → el QR aparece arriba de todo.</p>
+ <button type="button" id="spaste" class="scanbig" style="background:var(--card);color:var(--ac);border-color:var(--bd)">📋 Pegar código y conectar</button>
  <form id="fs"><textarea id="su" rows="3" placeholder="…o pegalo acá a mano" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="font:inherit;font-size:15px;padding:12px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);width:100%"></textarea>
  <div class="row"><button class="pri">Conectar</button></div></form>
  <p class="stats" id="se"></p></div>
 </div>
 
 <div id="va" hidden>
-<h1><img src="icons/icon-192.png" alt="">¿Ya lo leí?<span class="sp"></span><button id="cfg" title="Ajustes" aria-label="Ajustes">⚙︎</button></h1>
-<div id="toast" class="toast" hidden></div>
+<h1><img src="icon-192.png" alt="">¿Ya lo leí?<span class="sp"></span><button id="cfg" title="Ajustes" aria-label="Ajustes">⚙︎</button></h1>
 
 <div id="mp" class="panel" hidden></div>
 <div id="ap" class="panel" hidden><h2>Agregar un libro</h2>
 <button type="button" id="sa" class="scanbig">📷 Escanear código de barras</button>
 <p id="sinfo" class="stats" hidden></p>
-<form id="add"><div class="row"><input id="ni" placeholder="ISBN o título" autocomplete="off" style="flex:2"><button type="button" id="nb" style="flex:1;padding:12px">Buscar datos</button></div><input id="nt" placeholder="Título" required autocomplete="off"><input id="na" placeholder="Autor" required autocomplete="off">
+<form id="add"><div class="seg" id="ne"><button type="button" data-e="leido" class="on">Leído</button><button type="button" data-e="leyendo">Leyendo</button><button type="button" data-e="quiero">Quiero leer</button></div>
+<div class="row"><input id="ni" placeholder="ISBN o título" autocomplete="off" style="flex:2"><button type="button" id="nb" style="flex:1;padding:12px">Buscar datos</button></div><input id="nt" placeholder="Título" required autocomplete="off"><input id="na" placeholder="Autor" required autocomplete="off">
 <select id="ns"><option value="A revisar" selected>Subgénero: a revisar</option><optgroup label="Ficción"><option>Novela</option><option>Policial y suspenso</option><option>Novela histórica</option><option>Cuentos</option><option>Guion y teatro</option></optgroup><optgroup label="No ficción"><option>Memorias y autobiografía</option><option>Biografía</option><option>Crónica y periodismo</option><option>Literatura de viajes</option><option>Historia</option><option>Política y actualidad</option><option>Ensayo</option><option>Deportes</option><option>Montañismo</option><option>Divulgación, negocios y autoayuda</option></optgroup></select>
-<label>Terminado el <input id="nd" type="date" style="flex:1"></label>
+<label id="lnd">Terminado el <input id="nd" type="date" style="flex:1"></label>
+<label id="lndi">Empezado el <input id="ndi" type="date" style="flex:1"></label>
 <div class="row"><button type="button" id="cx">Cancelar</button><button class="pri">Guardar</button></div></form>
 <p class="stats" style="margin:8px 0 0">Se guarda en tu Google Sheets.</p></div>
 
 <div id="sp" class="panel" hidden><h2>Ajustes</h2>
-<p class="stats">Para conectar otro dispositivo, copiá este código y pegalo ahí cuando la app lo pida:</p>
-<p><code id="code"></code></p>
-<div class="row"><button type="button" id="cp">Copiar código</button><button type="button" id="rs">Actualizar ahora</button></div>
+<p class="stats" style="margin:0">Para conectar otro dispositivo: abrí ahí la app, tocá «Escanear el QR de otro dispositivo» y apuntá a este código.</p>
+<div id="qr" class="qr"></div>
+<details><summary class="stats">Usar el código de texto en vez del QR</summary><p><code id="code"></code></p><div class="row"><button type="button" id="cp">Copiar código</button></div></details>
+<div class="row" style="margin-top:10px"><button type="button" id="rs">Actualizar ahora</button></div>
 <p class="stats" style="margin-top:14px">ISBN de los libros que ya tenías: los busca en Google Books y elige la edición más cercana anterior a tu fecha de lectura. Tarda unos minutos; dejá la app abierta.</p>
 <div class="row"><button type="button" id="fi">Completar ISBN faltantes</button></div>
 <p class="stats" style="margin-top:14px">Con el libro en la mano: escaneás el código (o le sacás una foto) y se completa su ficha en la planilla: ISBN real y, si estaba estimado, el subgénero.</p>
 <div class="row"><button type="button" id="fs" class="pri">📷 Escanear mis libros</button></div><p class="stats" id="fis"></p>
 <p class="stats" style="margin:14px 0 6px">Apariencia</p>
 <div class="seg" id="thm"><button type="button" data-t="">Automática</button><button type="button" data-t="light">Clara</button><button type="button" data-t="dark">Oscura</button></div>
-<p class="stats" style="margin:10px 0 4px">Versión de la app: <b>15</b> · <button type="button" id="upd">Forzar actualización</button></p>
+<p class="stats" style="margin:10px 0 4px">Versión de la app: <b>16</b> · <button type="button" id="upd">Forzar actualización</button></p>
 <div class="row" style="margin-top:8px"><button type="button" id="dc">Desconectar este dispositivo</button><button type="button" id="sx" class="pri">Cerrar</button></div></div>
 
 <div id="v1">
 <div class="sr"><input id="q" type="search" placeholder="Título o autor…" autocomplete="off"><button id="sq" class="scan" title="Escanear código de barras" aria-label="Escanear código de barras">📷</button></div>
 <div id="res"></div>
+<div id="pl"></div>
 <div class="bar">
  <select id="fy"><option value="">Todos los años</option></select>
  <select id="fg"><option value="">Ficción y no ficción</option><option>Ficción</option><option>No ficción</option></select>
@@ -152,7 +173,9 @@ const $=id=>document.getElementById(id);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let cfg=store.get("cfg",null),books=store.get("books",[]),notes=store.get("notes",[]),busy=0;
 const nrm=s=>(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9ñ ]+/g," ").replace(/\s+/g," ").trim();
-const all=()=>books.map(b=>Object.assign({k:nrm(b.t+" "+b.a)},b));
+const est=b=>b.e||"leido";
+const all=()=>vista().filter(b=>est(b)==="leido").map(b=>Object.assign({k:nrm(b.t+" "+b.a)},b));
+const porLeer=()=>vista().filter(b=>est(b)!=="leido").map(b=>Object.assign({k:nrm(b.t+" "+b.a)},b));
 const fmt=d=>d?d.split("-").reverse().join("/"):"";
 const mk=c=>notes.filter(n=>n.c.includes(+c)).map(n=>n.m).join(",");
 const sup=c=>{const m=mk(c);return m?`<sup>${esc(m)}</sup>`:""};
@@ -161,21 +184,50 @@ const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOStr
 let sortK="c",asc=false;
 
 /* ---------- conexión con Google Sheets ---------- */
-async function api(body){
- const r=body?await fetch(cfg.u,{method:"POST",body:JSON.stringify(Object.assign({k:cfg.k},body))})
-            :await fetch(cfg.u+"?action=list&k="+encodeURIComponent(cfg.k)+"&_="+Date.now());
- const j=await r.json();if(!j.ok)throw new Error(j.error||"Error");notes=j.notes||[];store.set("notes",notes);return j.books}
+// Toda llamada a la planilla muestra la barrita de carga arriba. Los errores del servidor se marcan (srv) para distinguirlos de "sin conexión".
+async function api(body){busy++;$("prog").hidden=false;
+ try{let r;try{r=body?await fetch(cfg.u,{method:"POST",body:JSON.stringify(Object.assign({k:cfg.k},body))})
+            :await fetch(cfg.u+"?action=list&k="+encodeURIComponent(cfg.k)+"&_="+Date.now())}catch(e){e.red=true;throw e}
+  let j;try{j=await r.json()}catch(e){e.red=true;throw e}
+  if(!j.ok){const e=new Error(j.error||"Error");e.srv=true;throw e}notes=j.notes||[];store.set("notes",notes);return j.books}
+ finally{if(--busy<=0){busy=0;$("prog").hidden=true}}}
+/* ---------- cambios pendientes (se guardan en el teléfono y se suben cuando hay conexión) ---------- */
+let cola=store.get("cola",[]),borrando=new Map(),subiendo=false;
+const clave=b=>b.c?"n"+b.c:"t"+nrm(b.t)+"|"+nrm(b.a);
+function encolar(body){cola.push(Object.assign({id:Date.now()+Math.random()},body));store.set("cola",cola);refresh();return subir()}
+function subir(){if(!cfg)return Promise.resolve();if(subir.p)return subir.p.then(()=>cola.length&&!subir.red?subir():null);subir.p=subirYa().finally(()=>subir.p=null);return subir.p}
+async function subirYa(){subiendo=true;let red=false,subidos=0;const antes=subir.red||!navigator.onLine||!!store.get("cola",[]).length&&cola.length>1;subir.red=false;
+ try{while(cola.length){const it=cola[0],{id,...body}=it;
+  try{setBooks(await api(body))}catch(e){if(e.srv){toast("No se pudo guardar «"+((body.book||body).t||"el cambio")+"»: "+e.message,true)}else{red=true;break}}
+  cola.shift();store.set("cola",cola);subidos++}}
+ finally{subiendo=false;subir.red=red;refresh();estadoSync(red);if(subidos&&antes&&!red)toast(`✔ ${subidos} cambio${subidos>1?"s":""} subido${subidos>1?"s":""} a la planilla`)}}
+function estadoSync(red){const n=cola.length;status(n?`⏳ ${n} cambio${n>1?"s":""} sin subir${red||!navigator.onLine?" · sin conexión":""}`:red?"Sin conexión · mostrando lo último guardado":"Al día con tu Google Sheets")}
+// Libros tal como se ven en el teléfono: lo de la planilla + los cambios que todavía no subieron.
+function vista(){let l=books.map(b=>Object.assign({},b));
+ for(const it of cola){if(it.action==="add")l.push(Object.assign({c:0,y:0,i:"",e:"leido",di:""},it.book,{c:0,pend:1,y:it.book.d?+it.book.d.slice(0,4):0}));
+  else if(it.action==="update"){const b=l.find(x=>clave(x)===clave(it));if(b){if(it.e)b.e=it.e;if(it.d){b.d=it.d;b.y=+it.d.slice(0,4)}if(it.di)b.di=it.di;b.pend=1}}
+  else if(it.action==="del")l=l.filter(x=>clave(x)!==clave(it))}
+ return l.filter(b=>!borrando.has(clave(b)))}
 function setBooks(b){books=b;store.set("books",b);store.set("at",Date.now());refresh()}
 function status(t){$("sync").textContent=t}
 async function load(){if(!cfg)return;status("Sincronizando…");
- try{setBooks(await api());status("Al día con tu Google Sheets")}
- catch(e){status(navigator.onLine?"No se pudo conectar con la planilla":"Sin conexión · mostrando lo último guardado")}}
-function toast(t,err){const el=$("toast");el.textContent=t;el.classList.toggle("err",!!err);el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,4500)}
+ await subir();
+ try{setBooks(await api());estadoSync(false)}
+ catch(e){estadoSync(true);if(e.srv)status("La planilla respondió con un error: "+e.message)}}
+// Aviso flotante: verde si salió bien, rojo si falló; con acción opcional (por ejemplo «Deshacer»).
+function toast(t,err,act,ms){const el=$("toast"),b=$("ta");$("tt").textContent=t;el.classList.toggle("err",!!err);el.hidden=false;
+ b.hidden=!act;if(act){b.textContent=act.label;b.onclick=()=>{el.hidden=true;act.fn()}}
+ clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,ms||(err?7000:3500))}
+const cargando=(btn,txt)=>{btn.disabled=true;btn.dataset.txt=btn.dataset.txt||btn.textContent;btn.innerHTML='<i class="spin"></i>'+txt};
+const listo=btn=>{btn.disabled=false;btn.textContent=btn.dataset.txt||btn.textContent}
 
 /* ---------- configuración ---------- */
-function showApp(){$("vs").hidden=!!cfg;$("va").hidden=!cfg;document.body.classList.toggle("nav",!!cfg);if(cfg){$("code").textContent=cfg.u+"#"+cfg.k;refresh();load()}}
+function showApp(){$("vs").hidden=!!cfg;$("va").hidden=!cfg;document.body.classList.toggle("nav",!!cfg);if(cfg){$("code").textContent=cfg.u+"#"+cfg.k;dibujarQR();refresh();load()}}
+function enlaceQR(){const id=(cfg.u.match(/macros\/s\/([\w-]+)\/exec/)||[])[1];return location.origin+location.pathname.replace(/[^/]*$/,"")+"#c="+id+"."+cfg.k}
+function dibujarQR(){try{$("qr").innerHTML=qrSVG(enlaceQR())}catch(e){$("qr").hidden=true}}
 // Acepta el código en cualquier forma: "enlace#clave", el enlace y la clave separados, o un texto más largo que los contenga.
 function parseCode(txt){txt=String(txt||"");try{txt=decodeURIComponent(txt)}catch(e){}
+ const cc=txt.match(/#c=([\w-]{20,})\.([A-Za-z0-9]{12,})/);if(cc)return{u:"https://script.google.com/macros/s/"+cc[1]+"/exec",k:cc[2]};
  const u=(txt.match(/https:\/\/script\.google(?:usercontent)?\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec/)||[])[0];
  const k=(txt.match(/\/exec[#\s?&=k]*([A-Za-z0-9]{12,})/)||txt.match(/(?:clave|key)\W*([A-Za-z0-9]{12,})/i)||[])[1];
  return u&&k?{u,k}:null}
@@ -196,14 +248,14 @@ $("dc").onclick=()=>{if($("dc").dataset.ok!=="1"){$("dc").dataset.ok="1";$("dc")
  try{localStorage.clear()}catch(e){}cfg=null;books=[];$("sp").hidden=true;$("dc").dataset.ok="";$("dc").textContent="Desconectar este dispositivo";showApp()};
 
 /* ---------- búsqueda y tabla ---------- */
-function refresh(){fillYears();draw();search();if(!$("v2").hidden){fixed();pv()}}
+function refresh(){fillYears();draw();search();lecturas();if(!$("v2").hidden){fixed();pv()}}
 function fillYears(){const cur=$("fy").value,ys=[...new Set(books.map(b=>b.y).filter(Boolean))].sort();
  $("fy").innerHTML='<option value="">Todos los años</option>'+ys.map(y=>`<option${String(y)===cur?" selected":""}>${y}</option>`).join("")}
 function search(){const q=nrm($("q").value),r=$("res");
  if(q.length<2){r.innerHTML="";return}
- const tk=q.split(" "),h=all().filter(b=>tk.every(t=>b.k.includes(t)));
- let html=h.length?`<div class="verdict ok">✔ Sí, ya lo leíste (${h.length} coincidencia${h.length>1?"s":""})</div>`:`<div class="verdict no">✘ No figura en tu lista</div><button class="addq" id="addq">＋ Agregarlo como leído</button>`;
- html+='<div class="grid">';h.forEach(b=>html+=`<div class="hit"><b>${esc(b.t)}</b><span>${esc(b.a)} · N° ${b.c}${b.d?" · leído el "+fmt(b.d):b.y?" · "+b.y:""}${sup(b.c)}</span></div>`);
+ const tk=q.split(" "),h=all().filter(b=>tk.every(t=>b.k.includes(t))),p=porLeer().filter(b=>tk.every(t=>b.k.includes(t)));
+ let html=h.length?`<div class="verdict ok">✔ Sí, ya lo leíste (${h.length} coincidencia${h.length>1?"s":""})</div>`:p.length?`<div class="verdict info">${est(p[0])==="leyendo"?"📖 Lo estás leyendo":"📚 Está en tu lista «Quiero leer»"}: ${esc(p[0].t)}</div>`:`<div class="verdict no">✘ No figura en tu lista</div><button class="addq" id="addq">＋ Agregarlo</button>`;
+ html+='<div class="grid">';h.forEach(b=>html+=`<div class="hit${b.pend?" pend":""}"><b>${esc(b.t)}</b><span>${esc(b.a)}${b.c?" · N° "+b.c:""}${b.d?" · leído el "+fmt(b.d):b.y?" · "+b.y:""}${sup(b.c)}${b.pend?'<i class="chip">sin subir</i>':""}</span></div>`);
  r.innerHTML=html+"</div>";const aq=$("addq");if(aq)aq.onclick=()=>openAdd($("q").value.trim())}
 function foot(){const h=notes.length?"<b>Notas</b>"+notes.map(n=>`<p><sup>${esc(n.m)}</sup> ${esc(n.t)}${n.c.length?` <span>(N° ${esc(rng(n.c))})</span>`:""}</p>`).join(""):"";$("foot").innerHTML=h;$("foot2").innerHTML=h}
 const rng=a=>{const o=[];let s=a[0],p=a[0];for(const x of a.slice(1).concat([null])){if(x===p+1){p=x;continue}o.push(s===p?s:s+"–"+p);s=p=x}return o.join(", ")};
@@ -211,23 +263,44 @@ function draw(){let l=all();const y=$("fy").value,g=$("fg").value;
  if(y)l=l.filter(b=>String(b.y)===y);if(g)l=l.filter(b=>b.g===g);
  l.sort((a,b)=>{let x=a[sortK]||"",z=b[sortK]||"";if(sortK==="c"){x=+x;z=+z}else{x=String(x).toLowerCase();z=String(z).toLowerCase()}return(x>z?1:x<z?-1:0)*(asc?1:-1)});
  $("st").textContent=l.length+" libros";foot();
- $("tb").innerHTML=l.map(b=>`<tr><td>${b.c}</td><td>${esc(b.t)}</td><td>${esc(b.a)}</td><td>${esc(b.g||"")}</td><td>${fmt(b.d)||b.y||""}${sup(b.c)} <button data-del="${b.c}" title="Quitar">✕</button></td></tr>`).join("")}
+ $("tb").innerHTML=l.map(b=>`<tr${b.pend?' class="pend"':""}><td>${b.c||"⏳"}</td><td>${esc(b.t)}</td><td>${esc(b.a)}</td><td>${esc(b.g||"")}</td><td>${fmt(b.d)||b.y||""}${sup(b.c)} ${b.pend?"":`<button data-del="${esc(clave(b))}" title="Quitar" aria-label="Quitar ${esc(b.t)}">✕</button>`}</td></tr>`).join("")}
+// «Leyendo ahora» y «Quiero leer», arriba de la tabla.
+function lecturas(){const l=porLeer(),ly=l.filter(b=>est(b)==="leyendo"),qq=l.filter(b=>est(b)==="quiero"),el=$("pl");
+ const fila=(b,bot)=>`<div class="bk${b.pend?" pend":""}"><div><b>${esc(b.t)}</b><span>${esc(b.a)}${b.di?" · empezado el "+fmt(b.di):""}${b.pend?'<i class="chip">sin subir</i>':""}</span></div>${b.pend?"":bot+`<button type="button" data-del="${esc(clave(b))}" aria-label="Quitar ${esc(b.t)}">✕</button>`}</div>`;
+ el.className="pl";el.innerHTML=(ly.length?`<h3>📖 Leyendo ahora</h3>`+ly.map(b=>fila(b,`<button type="button" class="pri" data-fin="${esc(clave(b))}">✓ Terminado</button>`)).join(""):"")+
+  (qq.length?`<details${qq.length<=5?" open":""}><summary><h3 style="display:inline">📚 Quiero leer (${qq.length})</h3></summary>`+qq.map(b=>fila(b,`<button type="button" data-emp="${esc(clave(b))}">Empezar</button>`)).join("")+"</details>":"")}
+$("pl").onclick=e=>{const t=e.target.closest("button");if(!t)return;const b=porLeer().find(x=>clave(x)===(t.dataset.fin||t.dataset.emp||t.dataset.del));if(!b)return;
+ if(t.dataset.del){quitar(b);return}
+ const base={action:"update",c:b.c,t:b.t,a:b.a};
+ if(t.dataset.fin){encolar(Object.assign(base,{e:"leido",d:today()})).then(()=>{const n=books.find(x=>x.t===b.t&&x.a===b.a&&est(x)==="leido");toast(n?`✔ ¡Terminado! Quedó como N° ${n.c}`:"✔ Terminado · se sube cuando haya conexión")})}
+ else{encolar(Object.assign(base,{e:"leyendo",di:today()}));toast("📖 A leer: "+b.t)}};
 $("q").addEventListener("input",search);$("fy").onchange=$("fg").onchange=draw;
 document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k;asc=sortK===k?!asc:true;sortK=k;draw()});
 
 /* ---------- agregar y quitar ---------- */
-function openAdd(t){$("t3").classList.add("on");$("sp").hidden=true;$("mp").hidden=true;$("ap").hidden=false;$("nt").value=t||"";$("na").value="";$("ni").value="";$("ns").value="A revisar";$("sinfo").hidden=true;$("nd").value=today();window.scrollTo(0,0);(t?$("na"):$("nt")).focus()}
+function openAdd(t){$("t3").classList.add("on");ponerEstado("leido");$("ndi").value="";$("sp").hidden=true;$("mp").hidden=true;$("ap").hidden=false;$("nt").value=t||"";$("na").value="";$("ni").value="";$("ns").value="A revisar";$("sinfo").hidden=true;$("nd").value=today();window.scrollTo(0,0);(t?$("na"):$("nt")).focus()}
 function closeAdd(){$("ap").hidden=true;$("add").reset();$("t3").classList.remove("on")}
 $("t3").onclick=()=>$("ap").hidden?openAdd(""):closeAdd();$("cx").onclick=closeAdd;
+let estadoNuevo="leido";
+function ponerEstado(e){estadoNuevo=e;document.querySelectorAll("#ne button").forEach(b=>b.classList.toggle("on",b.dataset.e===e));
+ $("lnd").hidden=e!=="leido";$("lndi").hidden=e==="quiero";if(e==="leyendo"&&!$("ndi").value)$("ndi").value=today()}
+document.querySelectorAll("#ne button").forEach(b=>b.onclick=()=>ponerEstado(b.dataset.e));
 $("add").onsubmit=async e=>{e.preventDefault();
- const d=$("nd").value||today(),sub=$("ns").value,b={t:$("nt").value.trim(),a:$("na").value.trim(),g:GEN[sub]||"A revisar",s:sub,d:d,i:toIsbn($("ni").value)||""};
- const btn=e.submitter||e.target.querySelector(".pri");btn.disabled=true;btn.textContent="Guardando…";
- try{setBooks(await api({action:"add",book:b}));closeAdd();tab(1);$("q").value=b.t;search();toast("✔ Agregado: "+b.t)}
- catch(x){toast(navigator.onLine?"No se pudo guardar. Probá de nuevo.":"Sin conexión: no se pudo guardar.",true)}
- finally{btn.disabled=false;btn.textContent="Guardar"}};
-$("tb").onclick=async e=>{const c=e.target.dataset&&e.target.dataset.del;if(!c)return;
- if(e.target.dataset.ok!=="1"){e.target.dataset.ok="1";e.target.textContent="¿Quitar?";return}
- e.target.textContent="…";try{setBooks(await api({action:"del",c:+c}));toast("Quitado de la lista")}catch(x){toast("No se pudo quitar.",true);draw()}};
+ const sub=$("ns").value,es=estadoNuevo,b={t:$("nt").value.trim(),a:$("na").value.trim(),g:GEN[sub]||"A revisar",s:sub,i:toIsbn($("ni").value)||"",e:es,
+  d:es==="leido"?($("nd").value||today()):"",di:es==="quiero"?"":$("ndi").value||(es==="leyendo"?today():"")};
+ const btn=e.submitter||e.target.querySelector(".pri");cargando(btn,"Guardando…");
+ const n0=cola.length;closeAdd();tab(1);$("q").value=b.t;
+ await encolar({action:"add",book:b});listo(btn);search();
+ const que=es==="leido"?"Agregado":es==="leyendo"?"Agregado a «Leyendo»":"Agregado a «Quiero leer»";
+ toast(cola.length>n0?`⏳ ${que} en el teléfono · se sube a la planilla cuando haya conexión`:`✔ ${que}: ${b.t}`)};
+$("tb").onclick=e=>{const k=e.target.dataset&&e.target.dataset.del;if(!k)return;const b=vista().find(x=>clave(x)===k);if(b)quitar(b)};
+// Quitar: desaparece enseguida y hay unos segundos para deshacerlo; recién después se borra de la planilla.
+function quitar(b){const k=clave(b);
+ const t=setTimeout(()=>{borrando.delete(k);encolar({action:"del",c:b.c,t:b.t,a:b.a})},6000);
+ borrando.set(k,{t,b});refresh();
+ toast("Quitado: "+b.t,false,{label:"Deshacer",fn:()=>{clearTimeout(t);borrando.delete(k);refresh();toast("↩ Restaurado: "+b.t)}},6000)}
+// Si la app se cierra durante esos segundos, el borrado igual se guarda.
+addEventListener("pagehide",()=>{borrando.forEach(({t,b})=>{clearTimeout(t);cola.push({id:Date.now()+Math.random(),action:"del",c:b.c,t:b.t,a:b.a})});if(borrando.size){borrando.clear();store.set("cola",cola)}});
 
 /* ---------- dashboard ---------- */
 const yk=b=>b.y?String(b.y):"Sin año";
@@ -303,7 +376,7 @@ async function guessIsbn(b){
  return best?best.i:""}
 let fiRun=false;
 $("fi").onclick=async()=>{if(fiRun){fiRun=false;return}
- const todo=books.filter(b=>!b.i);if(!todo.length){$("fis").textContent="Todos los libros ya tienen ISBN.";return}
+ const todo=books.filter(b=>!b.i&&b.c);if(!todo.length){$("fis").textContent="Todos los libros ya tienen ISBN.";return}
  fiRun=true;$("fi").textContent="Detener";let ok=0,no=0,lote=[];
  const guardar=async()=>{if(!lote.length)return;const l=lote;lote=[];try{setBooks(await api({action:"isbn",list:l}))}catch(e){no+=l.length;ok-=l.length}};
  for(let n=0;n<todo.length&&fiRun;n++){const b=todo[n];$("fis").textContent=`Buscando ${n+1} de ${todo.length} · encontrados ${ok}`;
@@ -314,12 +387,12 @@ $("fi").onclick=async()=>{if(fiRun){fiRun=false;return}
 
 /* ---------- arranque ---------- */
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&cfg&&Date.now()-store.get("at",0)>60000)load()});
-window.addEventListener("online",load);
+window.addEventListener("online",load);window.addEventListener("offline",()=>estadoSync(true));
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").then(r=>r.update()).catch(()=>{});
 // Borra lo guardado en el teléfono y recarga la última versión publicada.
 $("upd").onclick=async()=>{toast("Actualizando…");try{for(const r of await navigator.serviceWorker.getRegistrations())await r.unregister();for(const k of await caches.keys())await caches.delete(k)}catch(e){}location.replace(location.pathname+"?v="+Date.now())};
-(async()=>{const h=location.hash;showApp();if(h.startsWith("#conectar=")&&!cfg){history.replaceState(null,"",location.pathname);
- if(await connect(h.slice(10)))toast("✔ Conectado con tu Google Sheets")}else if(h.startsWith("#conectar="))history.replaceState(null,"",location.pathname)})();
+(async()=>{const h=location.hash,ok=h.startsWith("#conectar=")||h.startsWith("#c=");showApp();if(ok)history.replaceState(null,"",location.pathname);
+ if(ok&&!cfg){if(await connect(h))toast("✔ Conectado con tu Google Sheets")}})();
 /* ---------- código de barras e ISBN ---------- */
 const GEN={"Novela":"Ficción","Policial y suspenso":"Ficción","Novela histórica":"Ficción","Cuentos":"Ficción","Guion y teatro":"Ficción",
  "Memorias y autobiografía":"No ficción","Biografía":"No ficción","Crónica y periodismo":"No ficción","Literatura de viajes":"No ficción","Historia":"No ficción",
@@ -404,26 +477,29 @@ let miss="";
 // Lectura del código: en vivo con la cámara si el navegador lo permite (Android/Chrome); si no, con una foto (iPhone).
 let scanMode="add",stream=null,loop=null;
 const hasLive=()=>"BarcodeDetector" in window&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia;
-async function startScan(mode){scanMode=mode;
- if(hasLive()){try{const fm=await BarcodeDetector.getSupportedFormats();if(!fm.includes("ean_13"))throw 0;
+async function startScan(mode){scanMode=mode;const qr=mode==="qr",fmt=qr?"qr_code":"ean_13";
+ if(hasLive()){try{const fm=await BarcodeDetector.getSupportedFormats();if(!fm.includes(fmt))throw 0;
    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
-   const v=$("sv");v.srcObject=stream;await v.play();$("sc").hidden=false;$("sm").textContent="Apuntá al código de barras de la contratapa";
-   const det=new BarcodeDetector({formats:["ean_13"]});
-   loop=setInterval(async()=>{try{const r=await det.detect(v);for(const c of r){const i=toIsbn(c.rawValue);if(i){stopScan();found(i);return}}}catch(e){}},250);
+   const v=$("sv");v.srcObject=stream;await v.play();$("sc").hidden=false;$("sm").textContent=qr?"Apuntá al QR que muestra el otro dispositivo":"Apuntá al código de barras de la contratapa";
+   const det=new BarcodeDetector({formats:[fmt]});
+   loop=setInterval(async()=>{try{const r=await det.detect(v);for(const c of r){if(qr){if(parseCode(c.rawValue)){stopScan();conectarQR(c.rawValue);return}continue}const i=toIsbn(c.rawValue);if(i){stopScan();found(i);return}}}catch(e){}},250);
    return}catch(e){stopScan()}}
  $("sf").value="";$("sf").click()}
 function stopScan(){clearInterval(loop);loop=null;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$("sc").hidden=true}
 $("scx").onclick=stopScan;
 $("sph").onclick=()=>{stopScan();$("sf").value="";$("sf").click()};
 $("sf").onchange=async()=>{const f=$("sf").files[0];if(!f)return;toast("Leyendo el código…");
+ if(scanMode==="qr"){const t=await decodePhoto(f,true);if(t)conectarQR(t);else{$("se").textContent="No pude leer el QR. Sacá la foto de frente, que el código ocupe buena parte de la imagen, o pegá el código de texto.";toast("No pude leer el QR.",true)}return}
  const i=await decodePhoto(f);if(i)found(i);else toast("No pude leer el código de barras. Sacá la foto de cerca, con el código derecho y bien iluminado (no el número escrito), o escribí el ISBN.",true)};
 
-async function decodePhoto(file){
+async function conectarQR(t){$("se").textContent="Conectando…";if(await connect(t))toast("✔ Conectado con tu Google Sheets")}
+$("sqr").onclick=()=>startScan("qr");
+async function decodePhoto(file,qr){
  const img=await new Promise((ok,ko)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>ok(im);im.onerror=ko;im.src=u}).catch(()=>null);
- if(!img)return"";
- if("BarcodeDetector" in window){try{const r=await new BarcodeDetector({formats:["ean_13"]}).detect(img);for(const c of r){const i=toIsbn(c.rawValue);if(i)return i}}catch(e){}}
+ if(!img)return"";const acepta=t=>qr?(parseCode(t)?t:""):toIsbn(t);
+ if("BarcodeDetector" in window){try{const r=await new BarcodeDetector({formats:[qr?"qr_code":"ean_13"]}).detect(img);for(const c of r){const i=acepta(c.rawValue);if(i)return i}}catch(e){}}
  const Z=await zxing();if(!Z)return"";
- const hints=new Map();hints.set(Z.DecodeHintType.POSSIBLE_FORMATS,[Z.BarcodeFormat.EAN_13]);hints.set(Z.DecodeHintType.TRY_HARDER,true);
+ const hints=new Map();hints.set(Z.DecodeHintType.POSSIBLE_FORMATS,[qr?Z.BarcodeFormat.QR_CODE:Z.BarcodeFormat.EAN_13]);hints.set(Z.DecodeHintType.TRY_HARDER,true);
  const rd=new Z.MultiFormatReader();rd.setHints(hints);
  // Prueba la foto entera y recortes del centro (donde suele estar apuntado el código), a varios tamaños y girada.
  for(const crop of[1,.6,.35])for(const max of[1600,1000,2400])for(const rot of[0,90]){
@@ -433,7 +509,7 @@ async function decodePhoto(file){
   if(rot){cv.width=h;cv.height=w;cx.translate(h,0);cx.rotate(Math.PI/2)}else{cv.width=w;cv.height=h}
   cx.drawImage(img,sx,sy,sw,sh,0,0,w,h);const d=cx.getImageData(0,0,cv.width,cv.height).data,lum=new Uint8ClampedArray(cv.width*cv.height);
   for(let p=0,q=0;q<lum.length;p+=4,q++)lum[q]=(d[p]*299+d[p+1]*587+d[p+2]*114)/1000;
-  try{const r=rd.decode(new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.RGBLuminanceSource(lum,cv.width,cv.height))));const i=toIsbn(r.getText());if(i)return i}catch(e){}
+  try{const r=rd.decode(new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.RGBLuminanceSource(lum,cv.width,cv.height))));const i=acepta(r.getText());if(i)return i}catch(e){}
  }return""}
 let zx=null;
 function zxing(){if(window.ZXing)return Promise.resolve(window.ZXing);if(zx)return zx;
@@ -529,5 +605,56 @@ async function byTitle(t,a){info("Buscando «"+t+"»…");
   $("nt").value=r.tm;$("na").value=r.a;$("ni").value=keep||r.i||"";const s=suggest(r.cats);if(s)$("ns").value=s;
   const dup=all().find(x=>nrm(x.t)===nrm(r.tm));
   info(dup?"⚠ Ojo: ya tenés uno con ese título (N° "+dup.c+"). Revisá antes de guardar.":"Datos de "+r.src+(s?", subgénero sugerido":"")+". Revisalos antes de guardar.")})}
+
+// Generador de códigos QR (modo byte, corrección M), basado en el algoritmo de referencia de Nayuki.
+function qrMatriz(texto){
+ const ECC=[-1,10,16,26,18,24,16,18,22,22,26,30,22,22,24,24,28,28,26,26,26,26,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28];
+ const BLQ=[-1,1,1,1,2,2,4,4,4,5,5,5,8,9,9,10,10,11,13,14,16,17,17,18,20,21,23,25,26,28,29,31,33,35,37,38,40,43,45,47,49];
+ const bytes=[...new TextEncoder().encode(texto)];
+ const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const n=Math.floor(v/7)+2;r-=(25*n-10)*n-55;if(v>=7)r-=36}return r};
+ const datos=v=>Math.floor(raw(v)/8)-ECC[v]*BLQ[v];
+ let ver=1;for(;ver<=40;ver++){const cc=ver<10?8:16;if(4+cc+bytes.length*8<=datos(ver)*8)break}
+ if(ver>40)throw new Error("Texto demasiado largo para un QR");
+ // bits de datos
+ const bb=[];const pon=(v,n)=>{for(let i=n-1;i>=0;i--)bb.push((v>>>i)&1)};
+ pon(4,4);pon(bytes.length,ver<10?8:16);bytes.forEach(b=>pon(b,8));
+ const cap=datos(ver)*8;pon(0,Math.min(4,cap-bb.length));pon(0,(8-bb.length%8)%8);
+ for(let p=0xEC;bb.length<cap;p^=0xEC^0x11)pon(p,8);
+ const cw=[];for(let i=0;i<bb.length;i+=8){let x=0;for(let j=0;j<8;j++)x=x<<1|bb[i+j];cw.push(x)}
+ // Reed-Solomon
+ const mul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x}return z};
+ const div=n=>{const r=new Array(n).fill(0);r[n-1]=1;let root=1;for(let i=0;i<n;i++){for(let j=0;j<n;j++){r[j]=mul(r[j],root);if(j+1<n)r[j]^=r[j+1]}root=mul(root,2)}return r};
+ const resto=(d,dv)=>{const r=new Array(dv.length).fill(0);for(const b of d){const f=b^r.shift();r.push(0);dv.forEach((c,i)=>r[i]^=mul(c,f))}return r};
+ const nb=BLQ[ver],el=ECC[ver],rc=Math.floor(raw(ver)/8),cortos=nb-rc%nb,lc=Math.floor(rc/nb),dv=div(el),bl=[];
+ for(let i=0,k=0;i<nb;i++){const d=cw.slice(k,k+lc-el+(i<cortos?0:1));k+=d.length;const e=resto(d,dv);if(i<cortos)d.push(0);bl.push(d.concat(e))}
+ const fin=[];for(let i=0;i<bl[0].length;i++)bl.forEach((b,j)=>{if(i!==lc-el||j>=cortos)fin.push(b[i])});
+ // matriz
+ const N=ver*4+17,M=[...Array(N)].map(()=>new Array(N).fill(false)),F=[...Array(N)].map(()=>new Array(N).fill(false));
+ const fm=(x,y,v)=>{M[y][x]=v;F[y][x]=true};
+ for(let i=0;i<N;i++){fm(6,i,i%2===0);fm(i,6,i%2===0)}
+ for(const[cx,cy]of[[3,3],[N-4,3],[3,N-4]])for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const x=cx+dx,y=cy+dy,d=Math.max(Math.abs(dx),Math.abs(dy));if(x>=0&&x<N&&y>=0&&y<N)fm(x,y,d!==2&&d!==4)}
+ if(ver>1){const n=Math.floor(ver/7)+2,st=ver===32?26:Math.ceil((ver*4+4)/(n*2-2))*2,pos=[6];for(let p=N-7;pos.length<n;p-=st)pos.splice(1,0,p);
+  pos.forEach((x,i)=>pos.forEach((y,j)=>{if((i===0&&j===0)||(i===0&&j===n-1)||(i===n-1&&j===0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)fm(x+dx,y+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1)}))}
+ const formato=mask=>{const d=0<<3|mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=(d<<10|r)^0x5412,g=i=>((b>>>i)&1)===1;
+  for(let i=0;i<=5;i++)fm(8,i,g(i));fm(8,7,g(6));fm(8,8,g(7));fm(7,8,g(8));for(let i=9;i<15;i++)fm(14-i,8,g(i));
+  for(let i=0;i<8;i++)fm(N-1-i,8,g(i));for(let i=8;i<15;i++)fm(8,N-15+i,g(i));fm(8,N-8,true)};
+ formato(0);
+ if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=ver<<12|r;for(let i=0;i<18;i++){const v=((b>>>i)&1)===1,a=N-11+i%3,c=Math.floor(i/3);fm(a,c,v);fm(c,a,v)}}
+ let i=0;for(let der=N-1;der>=1;der-=2){if(der===6)der=5;for(let vv=0;vv<N;vv++)for(let j=0;j<2;j++){const x=der-j,arriba=((der+1)&2)===0,y=arriba?N-1-vv:vv;
+  if(!F[y][x]&&i<fin.length*8){M[y][x]=((fin[i>>>3]>>>(7-(i&7)))&1)===1;i++}}}
+ const inv=(m,x,y)=>[(x+y)%2,y%2,x%3,(x+y)%3,(Math.floor(x/3)+Math.floor(y/2))%2,x*y%2+x*y%3,(x*y%2+x*y%3)%2,((x+y)%2+x*y%3)%2][m]===0;
+ const aplicar=m=>{for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(!F[y][x]&&inv(m,x,y))M[y][x]=!M[y][x]};
+ const castigo=()=>{let p=0,osc=0;
+  for(let y=0;y<N;y++){let rx=1,ry=1;for(let x=0;x<N;x++){if(M[y][x])osc++;
+   if(x>0){if(M[y][x]===M[y][x-1]){rx++;if(rx===5)p+=3;else if(rx>5)p++}else rx=1;if(M[x][y]===M[x-1][y]){ry++;if(ry===5)p+=3;else if(ry>5)p++}else ry=1}
+   if(x>0&&y>0){const c=M[y][x];if(c===M[y][x-1]&&c===M[y-1][x]&&c===M[y-1][x-1])p+=3}}}
+  const A=[1,0,1,1,1,0,1,0,0,0,0],B=A.slice().reverse(),pat=(g)=>{for(let y=0;y<N;y++)for(let x=0;x+11<=N;x++){let a=true,b=true;for(let k=0;k<11;k++){const v=g(x+k,y)?1:0;if(v!==A[k])a=false;if(v!==B[k])b=false;if(!a&&!b)break}if(a)p+=40;if(b)p+=40}};
+  pat((x,y)=>M[y][x]);pat((x,y)=>M[x][y]);
+  return p+Math.floor(Math.abs(osc*20-N*N*10)/(N*N))*10};
+ let mejor=0,min=1/0;for(let m=0;m<8;m++){aplicar(m);formato(m);const c=castigo();if(c<min){min=c;mejor=m}aplicar(m)}
+ aplicar(mejor);formato(mejor);return M}
+function qrSVG(texto){const M=qrMatriz(texto),N=M.length,q=4;let d="";
+ for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(M[y][x])d+=`M${x+q} ${y+q}h1v1h-1z`;
+ return `<svg viewBox="0 0 ${N+2*q} ${N+2*q}" width="100%" shape-rendering="crispEdges" role="img" aria-label="Código QR de conexión"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}
 
 </script></body></html>
