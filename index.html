@@ -10,14 +10,17 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mis libros">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#171716" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7efe2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1410" media="(prefers-color-scheme: dark)">
+<script>try{var t=JSON.parse(localStorage.getItem("theme")||"null");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
-:root{--bg:#faf9f6;--card:#fff;--tx:#1d1d1b;--mut:#6b6a66;--bd:#e3e0d8;--ok:#1b7a43;--okbg:#e4f4ea;--no:#a8321f;--nobg:#fbe9e5;--ac:#1f3864;--c1:#3b7dd8;--c2:#e0922f;--c3:#9a9a9a}
-@media (prefers-color-scheme:dark){:root{--bg:#171716;--card:#222220;--tx:#eeece6;--mut:#a09e97;--bd:#3a3935;--ok:#6fd49a;--okbg:#17301f;--no:#f0907d;--nobg:#3a1c16;--ac:#9db7ee}}
+:root{--bg:#f7efe2;--card:#fffaf3;--tx:#2a1f17;--mut:#7a6857;--bd:#e7d8c3;--ok:#2d6a4c;--okbg:#e2efe5;--no:#a3361f;--nobg:#f9e4dc;--ac:#6f4329;--c1:#2f6b4f;--c2:#b8532f;--c3:#a99a86;--nav:rgba(255,250,243,.92);color-scheme:light}
+:root[data-theme=dark]{--bg:#1a1410;--card:#251d17;--tx:#f2e8da;--mut:#b4a38e;--bd:#3c3128;--ok:#82cfa3;--okbg:#1c3226;--no:#f09a85;--nobg:#3b1d16;--ac:#e2b27c;--c1:#5fae86;--c2:#e48a63;--c3:#8b7d6c;--nav:rgba(37,29,23,.92);color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1a1410;--card:#251d17;--tx:#f2e8da;--mut:#b4a38e;--bd:#3c3128;--ok:#82cfa3;--okbg:#1c3226;--no:#f09a85;--nobg:#3b1d16;--ac:#e2b27c;--c1:#5fae86;--c2:#e48a63;--c3:#8b7d6c;--nav:rgba(37,29,23,.92);color-scheme:dark}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);-webkit-tap-highlight-color:transparent}
-main{margin:0 auto;padding:12px 16px 32px;max-width:1200px}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) 0 env(safe-area-inset-left,0);-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+main{margin:0 auto;padding:12px 16px calc(32px + env(safe-area-inset-bottom,0));max-width:1200px}
+body.nav main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0))}
 h1{font-size:20px;margin:4px 0 12px;display:flex;align-items:center;gap:8px}
 h1 img{width:30px;height:30px;border-radius:7px}
 h1 .sp{flex:1}
@@ -43,7 +46,6 @@ th{cursor:pointer;white-space:nowrap;position:sticky;top:0;background:var(--card
 [hidden]{display:none!important}.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
 #pv td.lb,#pv td[data-r]{cursor:pointer}
 label{display:flex;gap:6px;align-items:center;font-size:14px;color:var(--mut)}
-#t3{margin-left:auto;background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:600}
 .panel{background:var(--card);border:2px solid var(--ac);border-radius:12px;padding:14px;margin:0 0 14px}
 .panel h2{font-size:16px;margin:0 0 8px}.panel form{display:grid;gap:8px}.panel input,.panel select{font-size:17px;padding:12px;width:100%}
 .row{display:flex;gap:8px}.row button{flex:1;padding:12px;font-size:16px}.pri{background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:600}
@@ -63,6 +65,15 @@ code{font-size:13px;word-break:break-all}
 .pop{position:fixed;z-index:40;max-width:min(92vw,380px);max-height:50vh;overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px 12px;font-size:13px}
 .pop b{display:block;margin-bottom:6px;font-size:14px}.pop div{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-top:1px solid var(--bd)}.pop div span{color:var(--mut);white-space:nowrap}.sc .row{width:100%;max-width:640px}
 .foot{margin-top:14px;font-size:13px;color:var(--mut)}.foot p{margin:4px 0}.foot b{color:var(--tx)}sup{color:var(--ac);font-weight:600;margin-left:1px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-around;align-items:flex-end;background:var(--nav);-webkit-backdrop-filter:saturate(1.6) blur(16px);backdrop-filter:saturate(1.6) blur(16px);border-top:1px solid var(--bd);padding:6px calc(12px + env(safe-area-inset-right,0)) calc(6px + env(safe-area-inset-bottom,0)) calc(12px + env(safe-area-inset-left,0))}
+.tabs button{flex:1;max-width:160px;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;color:var(--mut);font-size:11px;font-weight:600;padding:4px 0;border-radius:12px}
+.tabs button svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tabs button.on{color:var(--ac);background:none;border:none}
+.tabs .add{flex:0 0 auto;width:62px;height:62px;min-height:0;max-width:none;margin:-22px 12px 2px;border-radius:50%;background:var(--ac);color:var(--bg);box-shadow:0 6px 18px rgba(60,35,15,.28)}
+.tabs .add svg{width:30px;height:30px;stroke-width:2.6}.tabs .add span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.tabs .add.on{color:var(--bg);background:var(--ac);outline:3px solid var(--bd)}
+body.kb .tabs{display:none}
+.seg{display:flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden}.seg button{flex:1;border:none;border-radius:0;padding:10px 6px}.seg button+button{border-left:1px solid var(--bd)}
 </style></head><body><main>
 
 <div id="pop" class="pop" hidden></div>
@@ -80,7 +91,6 @@ code{font-size:13px;word-break:break-all}
 
 <div id="va" hidden>
 <h1><img src="icons/icon-192.png" alt="">¿Ya lo leí?<span class="sp"></span><button id="cfg" title="Ajustes" aria-label="Ajustes">⚙︎</button></h1>
-<div class="bar" style="margin-top:0"><button id="t1" class="on">Buscar</button><button id="t2">Dashboard</button><button id="t3">＋ Agregar libro</button></div>
 <div id="toast" class="toast" hidden></div>
 
 <div id="mp" class="panel" hidden></div>
@@ -101,7 +111,9 @@ code{font-size:13px;word-break:break-all}
 <div class="row"><button type="button" id="fi">Completar ISBN faltantes</button></div>
 <p class="stats" style="margin-top:14px">Con el libro en la mano: escaneás el código (o le sacás una foto) y se completa su ficha en la planilla: ISBN real y, si estaba estimado, el subgénero.</p>
 <div class="row"><button type="button" id="fs" class="pri">📷 Escanear mis libros</button></div><p class="stats" id="fis"></p>
-<p class="stats" style="margin:10px 0 4px">Versión de la app: <b>14</b> · <button type="button" id="upd">Forzar actualización</button></p>
+<p class="stats" style="margin:14px 0 6px">Apariencia</p>
+<div class="seg" id="thm"><button type="button" data-t="">Automática</button><button type="button" data-t="light">Clara</button><button type="button" data-t="dark">Oscura</button></div>
+<p class="stats" style="margin:10px 0 4px">Versión de la app: <b>15</b> · <button type="button" id="upd">Forzar actualización</button></p>
 <div class="row" style="margin-top:8px"><button type="button" id="dc">Desconectar este dispositivo</button><button type="button" id="sx" class="pri">Cerrar</button></div></div>
 
 <div id="v1">
@@ -128,6 +140,11 @@ code{font-size:13px;word-break:break-all}
 <div id="dd"></div>
 <div id="foot2" class="foot"></div>
 </div>
+<nav class="tabs" aria-label="Secciones">
+<button id="t1" class="on" type="button"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Buscar</button>
+<button id="t3" class="add" type="button" aria-label="Agregar libro"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Agregar</span></button>
+<button id="t2" type="button"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Dashboard</button>
+</nav>
 </div>
 </main>
 <script>
@@ -156,7 +173,7 @@ async function load(){if(!cfg)return;status("Sincronizando…");
 function toast(t,err){const el=$("toast");el.textContent=t;el.classList.toggle("err",!!err);el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,4500)}
 
 /* ---------- configuración ---------- */
-function showApp(){$("vs").hidden=!!cfg;$("va").hidden=!cfg;if(cfg){$("code").textContent=cfg.u+"#"+cfg.k;refresh();load()}}
+function showApp(){$("vs").hidden=!!cfg;$("va").hidden=!cfg;document.body.classList.toggle("nav",!!cfg);if(cfg){$("code").textContent=cfg.u+"#"+cfg.k;refresh();load()}}
 // Acepta el código en cualquier forma: "enlace#clave", el enlace y la clave separados, o un texto más largo que los contenga.
 function parseCode(txt){txt=String(txt||"");try{txt=decodeURIComponent(txt)}catch(e){}
  const u=(txt.match(/https:\/\/script\.google(?:usercontent)?\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec/)||[])[0];
@@ -199,8 +216,8 @@ $("q").addEventListener("input",search);$("fy").onchange=$("fg").onchange=draw;
 document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k;asc=sortK===k?!asc:true;sortK=k;draw()});
 
 /* ---------- agregar y quitar ---------- */
-function openAdd(t){$("sp").hidden=true;$("mp").hidden=true;$("ap").hidden=false;$("nt").value=t||"";$("na").value="";$("ni").value="";$("ns").value="A revisar";$("sinfo").hidden=true;$("nd").value=today();window.scrollTo(0,0);(t?$("na"):$("nt")).focus()}
-function closeAdd(){$("ap").hidden=true;$("add").reset()}
+function openAdd(t){$("t3").classList.add("on");$("sp").hidden=true;$("mp").hidden=true;$("ap").hidden=false;$("nt").value=t||"";$("na").value="";$("ni").value="";$("ns").value="A revisar";$("sinfo").hidden=true;$("nd").value=today();window.scrollTo(0,0);(t?$("na"):$("nt")).focus()}
+function closeAdd(){$("ap").hidden=true;$("add").reset();$("t3").classList.remove("on")}
 $("t3").onclick=()=>$("ap").hidden?openAdd(""):closeAdd();$("cx").onclick=closeAdd;
 $("add").onsubmit=async e=>{e.preventDefault();
  const d=$("nd").value||today(),sub=$("ns").value,b={t:$("nt").value.trim(),a:$("na").value.trim(),g:GEN[sub]||"A revisar",s:sub,d:d,i:toIsbn($("ni").value)||""};
@@ -241,7 +258,16 @@ $("pv").onclick=e=>{const t=e.target.closest("td");if(!t||t.dataset.r===undefine
  const l=all().filter(b=>String(rd[1](b))===t.dataset.r&&(!cd||t.dataset.c===undefined||String(cd[1](b))===t.dataset.c));
  $("dd").innerHTML=`<p class="stats">${l.length} libro${l.length>1?"s":""}: ${esc(t.dataset.r)}${t.dataset.c?" · "+esc(t.dataset.c):""}</p>`+l.map(b=>`<div class="hit"><b>${esc(b.t)}</b><span>${esc(b.a)} · N° ${b.c}</span></div>`).join("")};
 function tab(n){$("v1").hidden=n!==1;$("v2").hidden=n!==2;$("t1").classList.toggle("on",n===1);$("t2").classList.toggle("on",n===2);if(n===2){fixed();pv()}}
-$("t1").onclick=()=>tab(1);$("t2").onclick=()=>tab(2);
+$("t1").onclick=()=>{if(!$("ap").hidden)closeAdd();tab(1);window.scrollTo(0,0)};$("t2").onclick=()=>{if(!$("ap").hidden)closeAdd();tab(2);window.scrollTo(0,0)};
+// Con el teclado abierto, la barra de abajo se esconde para no tapar lo que escribís.
+document.addEventListener("focusin",e=>{if(e.target.matches("input:not([type=date]),textarea"))document.body.classList.add("kb")});
+document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(!a||!a.matches("input:not([type=date]),textarea"))document.body.classList.remove("kb")},100));
+// Apariencia: automática (según el teléfono), clara u oscura.
+function setTheme(t){const r=document.documentElement;if(t)r.dataset.theme=t;else delete r.dataset.theme;store.set("theme",t||null);
+ document.querySelectorAll("#thm button").forEach(b=>b.classList.toggle("on",b.dataset.t===(t||"")));
+ const dark=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+ document.querySelectorAll('meta[name="theme-color"]').forEach(m=>{if(t)m.removeAttribute("media");m.content=dark?"#1a1410":"#f7efe2"})}
+document.querySelectorAll("#thm button").forEach(b=>b.onclick=()=>setTheme(b.dataset.t));setTheme(store.get("theme",null)||"");
 $("dr").onchange=()=>{$("ds").value=$("dr").value==="y"?"l":"t";pv()};$("dc2").onchange=$("ds").onchange=pv;
 
 /* ---------- ventana con títulos al pasar por un autor o subgénero ---------- */
