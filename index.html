@@ -101,6 +101,7 @@ code{font-size:13px;word-break:break-all}
 <div class="row"><button type="button" id="fi">Completar ISBN faltantes</button></div>
 <p class="stats" style="margin-top:14px">Con el libro en la mano: escaneás el código (o le sacás una foto) y se completa su ficha en la planilla: ISBN real y, si estaba estimado, el subgénero.</p>
 <div class="row"><button type="button" id="fs" class="pri">📷 Escanear mis libros</button></div><p class="stats" id="fis"></p>
+<p class="stats" style="margin:10px 0 4px">Versión de la app: <b>13</b> · <button type="button" id="upd">Forzar actualización</button></p>
 <div class="row" style="margin-top:8px"><button type="button" id="dc">Desconectar este dispositivo</button><button type="button" id="sx" class="pri">Cerrar</button></div></div>
 
 <div id="v1">
@@ -288,7 +289,9 @@ $("fi").onclick=async()=>{if(fiRun){fiRun=false;return}
 /* ---------- arranque ---------- */
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&cfg&&Date.now()-store.get("at",0)>60000)load()});
 window.addEventListener("online",load);
-if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").then(r=>r.update()).catch(()=>{});
+// Borra lo guardado en el teléfono y recarga la última versión publicada.
+$("upd").onclick=async()=>{toast("Actualizando…");try{for(const r of await navigator.serviceWorker.getRegistrations())await r.unregister();for(const k of await caches.keys())await caches.delete(k)}catch(e){}location.replace(location.pathname+"?v="+Date.now())};
 (async()=>{const h=location.hash;showApp();if(h.startsWith("#conectar=")&&!cfg){history.replaceState(null,"",location.pathname);
  if(await connect(h.slice(10)))toast("✔ Conectado con tu Google Sheets")}else if(h.startsWith("#conectar="))history.replaceState(null,"",location.pathname)})();
 /* ---------- código de barras e ISBN ---------- */
