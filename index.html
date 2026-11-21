@@ -315,13 +315,18 @@ function suggest(cats){const c=(cats||[]).join(" | ").toLowerCase();if(!c)return
 async function getJSON(u,ms=8000){const ac=new AbortController(),t=setTimeout(()=>ac.abort(),ms);
  try{const r=await fetch(u,{signal:ac.signal});return r.ok?await r.json():null}catch(e){return null}finally{clearTimeout(t)}}
 async function lookup(isbn){
- const g=await getJSON("https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn);
- const v=g&&g.items&&g.items[0]&&g.items[0].volumeInfo;
- if(v&&v.title)return{t:v.title,a:(v.authors||[]).join(" & "),cats:v.categories||[],src:"Google Books"};
+ // Varias fuentes, porque muchas ediciones argentinas faltan en alguna (y Google a veces corta por cupo).
+ for(const q of["isbn:"+isbn,isbn]){const g=await getJSON("https://www.googleapis.com/books/v1/volumes?q="+q);
+  const v=g&&g.items&&g.items[0]&&g.items[0].volumeInfo;
+  if(v&&v.title)return{t:v.title,a:(v.authors||[]).join(" & "),cats:v.categories||[],src:"Google Books"}}
  const o=await getJSON("https://openlibrary.org/api/books?format=json&jscmd=data&bibkeys=ISBN:"+isbn);
  const b=o&&o["ISBN:"+isbn];
  if(b&&b.title)return{t:b.title,a:(b.authors||[]).map(x=>x.name).join(" & "),cats:(b.subjects||[]).map(x=>x.name||x),src:"Open Library"};
- return null}
+ const s=await getJSON("https://openlibrary.org/search.json?limit=1&fields=title,author_name,subject&isbn="+isbn);
+ const d=s&&s.docs&&s.docs[0];
+ if(d&&d.title)return{t:d.title,a:(d.author_name||[]).join(" & "),cats:(d.subject||[]).slice(0,10),src:"Open Library"};
+ miss=isbn;return null}
+let miss="";
 
 // Lectura del código: en vivo con la cámara si el navegador lo permite (Android/Chrome); si no, con una foto (iPhone).
 let scanMode="add",stream=null,loop=null;
@@ -409,7 +414,7 @@ function showNone(isbn){const p=$("mp");p.innerHTML=`<h2>No lo encontré</h2><p 
  $("mpx").onclick=()=>p.hidden=true;$("mpn").onclick=()=>startScan("shelf")}
 async function fill(isbn){info("Buscando datos del ISBN "+isbn+"…");prefill(isbn,await lookup(isbn))}
 function prefill(isbn,m){
- if(!m){info("No encontré datos para ese ISBN. Completalo a mano.");$("nt").focus();return}
+ if(!m){info("Leí el ISBN "+isbn+", pero no figura en Google Books ni en Open Library (pasa con muchas ediciones argentinas). Escribí el título en Título y tocá Buscar datos: el ISBN escaneado se mantiene.");$("nt").focus();return}
  $("nt").value=m.t;$("na").value=m.a;const s=suggest(m.cats);if(s)$("ns").value=s;
  const dup=all().find(b=>nrm(b.t)===nrm(m.t));
  info(dup?"⚠ Ojo: ya tenés uno con ese título (N° "+dup.c+"). Revisá antes de guardar.":(m.src?"Datos de "+m.src:"Datos cargados")+(s?", subgénero sugerido":"")+". Revisalos antes de guardar.")}
@@ -419,6 +424,7 @@ $("fs").onclick=()=>{$("sp").hidden=true;startScan("shelf")};
 $("sa").onclick=()=>startScan("add");
 // "Buscar datos": con un ISBN busca esa edición; con texto (en el campo de arriba o en Título) busca por título y autor.
 $("nb").onclick=()=>{const v=$("ni").value.trim(),i=toIsbn(v);
+ if(i&&miss===i&&$("nt").value.trim().length>1){byTitle($("nt").value.trim(),$("na").value.trim());return}
  if(i){$("ni").value=i;fill(i);return}
  if(/^[\d\s-]*\d[\d\s-]*[xX]?$/.test(v)){info("Ese ISBN no es válido. Revisá los números (son 10 o 13).");return}
  const q=(/\d{9,}/.test(v)?"":v)||$("nt").value.trim();
@@ -438,7 +444,8 @@ async function byTitle(t,a){info("Buscando «"+t+"»…");
  const el=$("sinfo");el.hidden=false;
  el.innerHTML="<b>Elegí el libro:</b>"+res.map((r,n)=>`<button type="button" class="pick" data-n="${n}"><b>${esc(r.t)}</b><span>${esc(r.a||"Autor desconocido")}${r.y?" · "+esc(r.y):""}${r.p?" · "+esc(r.p):""}</span></button>`).join("")+`<button type="button" class="pick" data-n="-1"><span>Ninguno de estos: lo completo a mano</span></button>`;
  el.querySelectorAll(".pick").forEach(b=>b.onclick=()=>{const r=res[+b.dataset.n];if(!r){el.hidden=true;$("nt").focus();return}
-  $("nt").value=r.tm;$("na").value=r.a;$("ni").value=r.i||"";const s=suggest(r.cats);if(s)$("ns").value=s;
+  const keep=toIsbn($("ni").value.trim());
+  $("nt").value=r.tm;$("na").value=r.a;$("ni").value=keep||r.i||"";const s=suggest(r.cats);if(s)$("ns").value=s;
   const dup=all().find(x=>nrm(x.t)===nrm(r.tm));
   info(dup?"⚠ Ojo: ya tenés uno con ese título (N° "+dup.c+"). Revisá antes de guardar.":"Datos de "+r.src+(s?", subgénero sugerido":"")+". Revisalos antes de guardar.")})}
 
