@@ -101,7 +101,7 @@ code{font-size:13px;word-break:break-all}
 <div class="row"><button type="button" id="fi">Completar ISBN faltantes</button></div>
 <p class="stats" style="margin-top:14px">Con el libro en la mano: escaneás el código (o le sacás una foto) y se completa su ficha en la planilla: ISBN real y, si estaba estimado, el subgénero.</p>
 <div class="row"><button type="button" id="fs" class="pri">📷 Escanear mis libros</button></div><p class="stats" id="fis"></p>
-<p class="stats" style="margin:10px 0 4px">Versión de la app: <b>13</b> · <button type="button" id="upd">Forzar actualización</button></p>
+<p class="stats" style="margin:10px 0 4px">Versión de la app: <b>14</b> · <button type="button" id="upd">Forzar actualización</button></p>
 <div class="row" style="margin-top:8px"><button type="button" id="dc">Desconectar este dispositivo</button><button type="button" id="sx" class="pri">Cerrar</button></div></div>
 
 <div id="v1">
@@ -328,7 +328,51 @@ async function lookup(isbn){
  const s=await getJSON("https://openlibrary.org/search.json?limit=1&fields=title,author_name,subject&isbn="+isbn);
  const d=s&&s.docs&&s.docs[0];
  if(d&&d.title)return{t:d.title,a:(d.author_name||[]).join(" & "),cats:(d.subject||[]).slice(0,10),src:"Open Library"};
+ // Último recurso: tu conexión de Google busca el ISBN en la web y se arman título y autor con los resultados.
+ const w=await viaWeb(isbn);if(w)return w;
  miss=isbn;return null}
+async function viaWeb(isbn){if(!cfg)return null;
+ try{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),20000);
+  const r=await fetch(cfg.u,{method:"POST",signal:ac.signal,body:JSON.stringify({k:cfg.k,action:"buscar",isbn})}).then(x=>x.json());clearTimeout(tm);
+  if(!r||!r.ok)return null;if(r.found&&r.found.t)return r.found;
+  const c=parseWeb(r.web||[]);return c.length?Object.assign({},c[0],{alts:c}):null}catch(e){return null}}
+// Convierte títulos de resultados ("Libro Mitomanías Argentinas - Alejandro Grimson | Mercado Libre") en título y autor, por votación.
+const SITIO=/mercado ?libre|amazon|goodreads|google|c[uú]spide|buscalibre|casa del libro|tematika|yenny|ateneo|librer[ií]a|\blibros$|scribd|iberlibro|abebooks|todostuslibros|agapea|fnac|ebay|wikipedia|\bisbn\b|facebook|instagram|youtube|pdf|epub|env[ií]o|comprar|precio|\.com|\.ar\b/i;
+const EDIT=/siglo (xxi|veintiuno)|editor|ediciones|planeta|anagrama|penguin|random|sudamericana|emec[eé]|alfaguara|seix|tusquets|paid[oó]s|fondo de cultura|eterna cadencia|hidalgo|mardulce|blatt|booket|debolsillo|catapulta|salamandra|sexto piso|caja negra|interzona|galerna|capital intelectual|del zorzal|edhasa|eudeba|colihue|corregidor|losada|marea|grupo/i;
+const MAY=s=>{const L=s.replace(/[^A-Za-zÁÉÍÓÚÑÜáéíóúñü]/g,"");return !!L&&L===L.toUpperCase()};
+function fixCase(t){if(!MAY(t))return t;
+ return t.toLowerCase().replace(/(^|[\s(¿¡"'])([a-záéíóúñü])/g,(m,a,b)=>a+b.toUpperCase()).replace(/ (De|La|El|Los|Las|Y|En|Del|A|Un|Una|Al|Por|Con|Sin|Para|Que|Como) /g,x=>x.toLowerCase())}
+const esNombre=p=>/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ.'´\s&-]+$/.test(p)&&p.trim().split(/\s+/).length>=2&&p.trim().split(/\s+/).length<=4&&!/\s(por|de|del|la|los|las|el|y|en)\s/i.test(' '+p+' ')&&!EDIT.test(p)&&!SITIO.test(p);
+const nota=s=>(/[áéíóúñÁÉÍÓÚÑ]/.test(s)?2:0)+(MAY(s)?0:1);
+function uno(raw){let t=String(raw||""),nat=/\s[a-záéíóúñ]{3,}/.test(String(raw||"").replace(/\s(de|del|la|los|las|el|y|en|por|con|para|que|como)\s/g,' ')),trunc=/(…|\.{3})\s*$/.test(t);
+ t=t.replace(/^amazon\.[a-z.]+:\s*/i,"").replace(/\[[^\]]*\]/g," ").replace(/\((colecci[oó]n|tapa|paperback|hardcover)[^)]*\)?/gi," ")
+  .replace(/(…|\.{3}).*$/,"").replace(/\bISBN[\s:]*[\dxX-]+/gi," ").replace(/\b97[89][\d-]{10,}\b/g," ").replace(/:\s*\d{9,}[\dxX]?\b/g," ")
+  .replace(/\b(softcover|paperback|hardcover|tapa blanda|tapa dura|e-?book)\b/gi," ").replace(/^\s*libros?\b\s*[:-]?\s*/i,"").replace(/\s+/g," ").trim();
+ let parts=t.split(/\s+[|\-–—·/]\s+|\s*\|\s*|\s+[-–—]$/).map(x=>x.trim().replace(/^[-–—:,]+|[-–—:,]+$/g,"").trim()).filter(x=>x.length>1);
+ parts=parts.filter(x=>!SITIO.test(x)&&!EDIT.test(x)&&!/^[\d\s-]+$/.test(x));
+ if(parts.length>1&&!/\s/.test(parts[0])&&/\s/.test(parts[1])&&!esNombre(parts[1]))parts.shift();
+ if(!parts.length)return null;
+ let ti=parts[0],au="";
+ const por=/^(.+?)\s+por\s+(.+)$/i.exec(ti);if(por&&esNombre(por[2])){ti=por[1];au=por[2]}
+ if(!au){const c=/^(.+),\s*([^,]+)$/.exec(ti);if(c&&esNombre(c[2])){ti=c[1];au=c[2]}}
+ if(!au){const d=/^(.+?)\s+de\s+([A-ZÁÉÍÓÚ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚ][a-záéíóúñ]+){1,2})$/.exec(ti);if(d){ti=d[1];au=d[2]}}
+ if(!au)au=parts.slice(1).find(esNombre)||"";
+ ti=ti.split(/\s*:\s+/)[0].replace(/^["'«]|["'»]$/g,"").trim();
+ if(ti.length<2||ti.length>90)return null;return{ti,au,trunc,nat}}
+function parseWeb(list){const G=[];
+ const items=list.map(r=>Object.assign(uno(r.t)||{},{txt:(r.t||"")+" "+(r.s||"")})).filter(x=>x.ti);
+ items.sort((a,b)=>a.ti.length-b.ti.length);
+ for(const it of items){const k=nrm(it.ti);let g=G.find(g=>k===g.k||k.startsWith(g.k+" ")||(it.trunc&&g.k.startsWith(k)));
+  if(!g){g={k,n:0,T:{},A:{},txt:[],f:it.ti};G.push(g)}g.n++;g.txt.push(it.txt);
+  if(!it.trunc){const e=g.T[k]||(g.T[k]={n:0,v:{}});e.n++;e.v[it.ti]=1}
+  if(it.au){const ak=nrm(it.au).split(" ").sort().join(" ");const a=g.A[ak]||(g.A[ak]={n:0,o:{},v:{}});a.n++;const ok=nrm(it.au);a.o[ok]=(a.o[ok]||0)+1+(it.nat?2:0);(a.v[ok]=a.v[ok]||[]).push(it.au)}}
+  return G.sort((x,y)=>y.n-x.n).slice(0,5).map(g=>{
+  const TK=Object.entries(g.T).sort((x,y)=>y[1].n-x[1].n||y[0].length-x[0].length)[0];
+  const t=TK?Object.keys(TK[1].v).sort((x,y)=>nota(y)-nota(x))[0]:g.f;
+  const A=Object.values(g.A).sort((x,y)=>y.n-x.n)[0];let a="";
+  if(A){const o=Object.entries(A.o).sort((x,y)=>y[1]-x[1])[0][0];a=A.v[o].sort((x,y)=>nota(y)-nota(x))[0]}
+  return{t:fixCase(t),a:fixCase(a),cats:g.txt,src:"la web"}})}
+
 let miss="";
 
 // Lectura del código: en vivo con la cámara si el navegador lo permite (Android/Chrome); si no, con una foto (iPhone).
@@ -420,6 +464,10 @@ const gURL=i=>"https://www.google.com/search?q="+encodeURIComponent("ISBN "+i);
 // Si las bases no lo tienen, abre la búsqueda de Google directamente (y deja el enlace por si el teléfono bloquea la ventana).
 function google(i){let w=null;try{w=window.open(gURL(i),"_blank")}catch(e){}return w}
 function prefill(isbn,m){
+ if(m&&m.alts&&m.alts.length>1){$("nt").value=m.t;$("na").value=m.a;const s0=suggest(m.cats);if(s0)$("ns").value=s0;
+  const el=$("sinfo");el.hidden=false;
+  el.innerHTML="<b>Lo encontré en la web.</b> Cargué la opción más repetida; si no es, elegí otra:"+m.alts.map((r,n)=>`<button type="button" class="pick" data-n="${n}"><b>${esc(r.t)}</b><span>${esc(r.a||"Autor sin identificar")}</span></button>`).join("")+`<a href="${gURL(isbn)}" target="_blank" rel="noopener">🔎 Ver en Google</a>`;
+  el.querySelectorAll(".pick").forEach(b=>b.onclick=()=>{const r=m.alts[+b.dataset.n];$("nt").value=r.t;$("na").value=r.a;const s=suggest(r.cats);if(s)$("ns").value=s;info("Datos de la web. Revisalos antes de guardar (sobre todo el autor y el subgénero).")});return}
  if(!m){google(isbn);const el=$("sinfo");el.hidden=false;
   el.innerHTML=`Leí el ISBN ${isbn}, pero no está en Google Books ni en Open Library. Te abrí la búsqueda en Google: <a href="${gURL(isbn)}" target="_blank" rel="noopener"><b>🔎 Ver en Google</b></a>. Copiá el título y el autor acá y guardá: el ISBN escaneado se mantiene.`;return}
  $("nt").value=m.t;$("na").value=m.a;const s=suggest(m.cats);if(s)$("ns").value=s;
