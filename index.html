@@ -4,8 +4,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mis libros leídos</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="icon-192.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mis libros">
@@ -55,6 +55,7 @@ code{font-size:13px;word-break:break-all}
 .sr{display:flex;gap:8px}.sr #q{flex:1}.scan{font-size:22px;padding:0 14px;border:2px solid var(--bd);border-radius:12px;background:var(--card)}
 .scanbig{width:100%;padding:14px;font-size:17px;font-weight:600;margin-bottom:8px;background:var(--okbg);color:var(--ok);border:2px solid var(--ok);border-radius:12px}
 #sinfo{margin:0 0 8px}
+.pick{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px;border-radius:10px}.pick b{display:block;color:var(--tx)}.pick span{font-size:13px;color:var(--mut)}
 .sc{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0)}
 .sc video{width:100%;max-width:640px;border-radius:12px}.sc .fr{position:absolute;width:min(80vw,520px);height:22vw;max-height:180px;border:3px solid #6fd49a;border-radius:12px;pointer-events:none}
 .sc p{color:#fff;text-align:center}
@@ -68,7 +69,7 @@ code{font-size:13px;word-break:break-all}
 <div id="sc" class="sc" hidden><video id="sv" playsinline muted></video><div class="fr"></div><p id="sm">Apuntá al código de barras de la contratapa</p><div class="row"><button type="button" id="sph">📸 Sacar foto</button><button type="button" id="scx">Cancelar</button></div></div>
 <input id="sf" type="file" accept="image/*" capture="environment" hidden>
 <div id="vs" class="setup" hidden>
- <img src="icon-192.png" alt="">
+ <img src="icons/icon-192.png" alt="">
  <div class="panel"><h2>Conectar con tu Google Sheets</h2>
  <p class="stats" style="margin:0 0 10px">Lo hacés una sola vez en cada dispositivo. Copiá el código de conexión y tocá el botón verde.</p>
  <button type="button" id="spaste" class="scanbig">📋 Pegar código y conectar</button>
@@ -78,7 +79,7 @@ code{font-size:13px;word-break:break-all}
 </div>
 
 <div id="va" hidden>
-<h1><img src="icon-192.png" alt="">¿Ya lo leí?<span class="sp"></span><button id="cfg" title="Ajustes" aria-label="Ajustes">⚙︎</button></h1>
+<h1><img src="icons/icon-192.png" alt="">¿Ya lo leí?<span class="sp"></span><button id="cfg" title="Ajustes" aria-label="Ajustes">⚙︎</button></h1>
 <div class="bar" style="margin-top:0"><button id="t1" class="on">Buscar</button><button id="t2">Dashboard</button><button id="t3">＋ Agregar libro</button></div>
 <div id="toast" class="toast" hidden></div>
 
@@ -86,7 +87,7 @@ code{font-size:13px;word-break:break-all}
 <div id="ap" class="panel" hidden><h2>Agregar un libro</h2>
 <button type="button" id="sa" class="scanbig">📷 Escanear código de barras</button>
 <p id="sinfo" class="stats" hidden></p>
-<form id="add"><div class="row"><input id="ni" placeholder="ISBN (opcional)" inputmode="numeric" autocomplete="off" style="flex:2"><button type="button" id="nb" style="flex:1;padding:12px">Buscar datos</button></div><input id="nt" placeholder="Título" required autocomplete="off"><input id="na" placeholder="Autor" required autocomplete="off">
+<form id="add"><div class="row"><input id="ni" placeholder="ISBN o título" autocomplete="off" style="flex:2"><button type="button" id="nb" style="flex:1;padding:12px">Buscar datos</button></div><input id="nt" placeholder="Título" required autocomplete="off"><input id="na" placeholder="Autor" required autocomplete="off">
 <select id="ns"><option value="A revisar" selected>Subgénero: a revisar</option><optgroup label="Ficción"><option>Novela</option><option>Policial y suspenso</option><option>Novela histórica</option><option>Cuentos</option><option>Guion y teatro</option></optgroup><optgroup label="No ficción"><option>Memorias y autobiografía</option><option>Biografía</option><option>Crónica y periodismo</option><option>Literatura de viajes</option><option>Historia</option><option>Política y actualidad</option><option>Ensayo</option><option>Deportes</option><option>Montañismo</option><option>Divulgación, negocios y autoayuda</option></optgroup></select>
 <label>Terminado el <input id="nd" type="date" style="flex:1"></label>
 <div class="row"><button type="button" id="cx">Cancelar</button><button class="pri">Guardar</button></div></form>
@@ -337,7 +338,7 @@ function stopScan(){clearInterval(loop);loop=null;if(stream){stream.getTracks().
 $("scx").onclick=stopScan;
 $("sph").onclick=()=>{stopScan();$("sf").value="";$("sf").click()};
 $("sf").onchange=async()=>{const f=$("sf").files[0];if(!f)return;toast("Leyendo el código…");
- const i=await decodePhoto(f);if(i)found(i);else toast("No pude leer el código. Probá con más luz y el código derecho, o escribí el ISBN.",true)};
+ const i=await decodePhoto(f);if(i)found(i);else toast("No pude leer el código de barras. Sacá la foto de cerca, con el código derecho y bien iluminado (no el número escrito), o escribí el ISBN.",true)};
 
 async function decodePhoto(file){
  const img=await new Promise((ok,ko)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>ok(im);im.onerror=ko;im.src=u}).catch(()=>null);
@@ -346,11 +347,13 @@ async function decodePhoto(file){
  const Z=await zxing();if(!Z)return"";
  const hints=new Map();hints.set(Z.DecodeHintType.POSSIBLE_FORMATS,[Z.BarcodeFormat.EAN_13]);hints.set(Z.DecodeHintType.TRY_HARDER,true);
  const rd=new Z.MultiFormatReader();rd.setHints(hints);
- for(const max of[1600,1000,2400])for(const rot of[0,90]){
-  const sc=Math.min(1,max/Math.max(img.width,img.height)),w=Math.round(img.width*sc),h=Math.round(img.height*sc);
+ // Prueba la foto entera y recortes del centro (donde suele estar apuntado el código), a varios tamaños y girada.
+ for(const crop of[1,.6,.35])for(const max of[1600,1000,2400])for(const rot of[0,90]){
+  const sw=img.width*crop,sh=img.height*crop,sx=(img.width-sw)/2,sy=(img.height-sh)/2;
+  const sc=Math.min(1,max/Math.max(sw,sh)),w=Math.round(sw*sc),h=Math.round(sh*sc);
   const cv=document.createElement("canvas"),cx=cv.getContext("2d");
   if(rot){cv.width=h;cv.height=w;cx.translate(h,0);cx.rotate(Math.PI/2)}else{cv.width=w;cv.height=h}
-  cx.drawImage(img,0,0,w,h);const d=cx.getImageData(0,0,cv.width,cv.height).data,lum=new Uint8ClampedArray(cv.width*cv.height);
+  cx.drawImage(img,sx,sy,sw,sh,0,0,w,h);const d=cx.getImageData(0,0,cv.width,cv.height).data,lum=new Uint8ClampedArray(cv.width*cv.height);
   for(let p=0,q=0;q<lum.length;p+=4,q++)lum[q]=(d[p]*299+d[p+1]*587+d[p+2]*114)/1000;
   try{const r=rd.decode(new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.RGBLuminanceSource(lum,cv.width,cv.height))));const i=toIsbn(r.getText());if(i)return i}catch(e){}
  }return""}
@@ -414,6 +417,29 @@ function info(t){$("sinfo").textContent=t;$("sinfo").hidden=false}
 $("sq").onclick=()=>startScan("search");
 $("fs").onclick=()=>{$("sp").hidden=true;startScan("shelf")};
 $("sa").onclick=()=>startScan("add");
-$("nb").onclick=()=>{const i=toIsbn($("ni").value);if(!i){info("Ese ISBN no es válido. Revisá los números.");return}$("ni").value=i;fill(i)};
+// "Buscar datos": con un ISBN busca esa edición; con texto (en el campo de arriba o en Título) busca por título y autor.
+$("nb").onclick=()=>{const v=$("ni").value.trim(),i=toIsbn(v);
+ if(i){$("ni").value=i;fill(i);return}
+ if(/^[\d\s-]*\d[\d\s-]*[xX]?$/.test(v)){info("Ese ISBN no es válido. Revisá los números (son 10 o 13).");return}
+ const q=(/\d{9,}/.test(v)?"":v)||$("nt").value.trim();
+ if(q.length<2){info("Escribí un ISBN o el título (si sabés el autor, ponelo en Autor y busco más preciso).");return}
+ byTitle(q,$("na").value.trim())};
+async function byTitle(t,a){info("Buscando «"+t+"»…");
+ const q="intitle:"+t+(a?" inauthor:"+a.split(" ").pop():"");
+ let res=[];const g=await getJSON("https://www.googleapis.com/books/v1/volumes?maxResults=12&printType=books&q="+encodeURIComponent(q));
+ for(const it of(g&&g.items)||[]){const v=it.volumeInfo||{};let i="";for(const x of v.industryIdentifiers||[]){const c=toIsbn(x.identifier);if(c&&(x.type==="ISBN_13"||!i))i=c}
+  res.push({t:v.title+(v.subtitle?". "+v.subtitle:""),tm:v.title,a:(v.authors||[]).join(" & "),y:(v.publishedDate||"").slice(0,4),p:v.publisher||"",i,cats:v.categories||[],src:"Google Books"})}
+ if(!res.length){const o=await getJSON("https://openlibrary.org/search.json?limit=10&fields=title,author_name,first_publish_year,isbn,subject&title="+encodeURIComponent(t)+(a?"&author="+encodeURIComponent(a):""));
+  for(const d of(o&&o.docs)||[])res.push({t:d.title,tm:d.title,a:(d.author_name||[]).join(" & "),y:d.first_publish_year||"",p:"",i:toIsbn(((d.isbn||[]).find(x=>toIsbn(x)))||""),cats:(d.subject||[]).slice(0,10),src:"Open Library"})}
+ // sin repetir la misma obra/autor más de una vez
+ res.sort((x,y)=>(y.i?1:0)-(x.i?1:0));
+ const seen=new Set();res=res.filter(r=>{const k=nrm(r.tm)+"|"+nrm(r.a);if(seen.has(k))return false;seen.add(k);return true}).slice(0,6);
+ if(!res.length){info("No encontré ese título en Google Books ni en Open Library. Completalo a mano.");return}
+ const el=$("sinfo");el.hidden=false;
+ el.innerHTML="<b>Elegí el libro:</b>"+res.map((r,n)=>`<button type="button" class="pick" data-n="${n}"><b>${esc(r.t)}</b><span>${esc(r.a||"Autor desconocido")}${r.y?" · "+esc(r.y):""}${r.p?" · "+esc(r.p):""}</span></button>`).join("")+`<button type="button" class="pick" data-n="-1"><span>Ninguno de estos: lo completo a mano</span></button>`;
+ el.querySelectorAll(".pick").forEach(b=>b.onclick=()=>{const r=res[+b.dataset.n];if(!r){el.hidden=true;$("nt").focus();return}
+  $("nt").value=r.tm;$("na").value=r.a;$("ni").value=r.i||"";const s=suggest(r.cats);if(s)$("ns").value=s;
+  const dup=all().find(x=>nrm(x.t)===nrm(r.tm));
+  info(dup?"⚠ Ojo: ya tenés uno con ese título (N° "+dup.c+"). Revisá antes de guardar.":"Datos de "+r.src+(s?", subgénero sugerido":"")+". Revisalos antes de guardar.")})}
 
 </script></body></html>
