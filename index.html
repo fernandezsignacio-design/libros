@@ -69,7 +69,7 @@ code{font-size:13px;word-break:break-all}
 .tabs button{flex:1;max-width:160px;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;color:var(--mut);font-size:11px;font-weight:600;padding:4px 0;border-radius:12px}
 .tabs button svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tabs button.on{color:var(--ac);background:none;border:none}
-.tabs .add{flex:0 0 auto;width:62px;height:62px;min-height:0;max-width:none;margin:-22px 12px 2px;border-radius:50%;background:var(--ac);color:var(--bg);box-shadow:0 6px 18px rgba(60,35,15,.28)}
+.tabs .add{flex:0 0 auto;width:60px;height:60px;min-height:0;max-width:none;margin:-22px 4px 2px;border-radius:50%;background:var(--ac);color:var(--bg);box-shadow:0 6px 18px rgba(60,35,15,.28)}
 .tabs .add svg{width:30px;height:30px;stroke-width:2.6}.tabs .add span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .tabs .add.on{color:var(--bg);background:var(--ac);outline:3px solid var(--bd)}
 body.kb .tabs{display:none}
@@ -84,6 +84,8 @@ body.nav .snack{bottom:calc(92px + env(safe-area-inset-bottom,0))}body.kb .snack
 .spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:gira .7s linear infinite;vertical-align:-2px;margin-right:6px}@keyframes gira{to{transform:rotate(360deg)}}
 .qr{width:min(70vw,240px);margin:12px auto;background:#fff;padding:6px;border-radius:12px}
 details summary{cursor:pointer;padding:8px 0}
+.scanbig.alt{background:var(--card);color:var(--ac);border-color:var(--bd);margin-top:8px}.capt{display:flex;gap:10px;align-items:flex-start}.capt img{width:64px;max-height:120px;object-fit:cover;object-position:top;border-radius:6px;border:1px solid var(--bd)}
+.hd{font-size:17px;margin:14px 0 0}.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0 6px}.kpi{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 6px;text-align:center}.kpi b{display:block;font-size:32px;line-height:1.15;color:var(--ac);font-variant-numeric:tabular-nums}.kpi span{font-size:12px;color:var(--mut);line-height:1.2;display:block}.vacio{background:var(--card);border:1px dashed var(--bd);border-radius:12px;padding:16px;text-align:center;color:var(--mut)}
 .pl h3{font-size:15px;margin:14px 0 6px}.bk{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:8px 10px 8px 14px;margin:6px 0}
 .bk div{flex:1;min-width:0}.bk b{display:block}.bk span{color:var(--mut);font-size:13px}.bk button{flex:0 0 auto}
 .pend td,.bk.pend{opacity:.65}.chip{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--bd);color:var(--mut);margin-left:6px;vertical-align:1px}
@@ -95,6 +97,7 @@ details summary{cursor:pointer;padding:8px 0}
 <div id="pop" class="pop" hidden></div>
 <div id="sc" class="sc" hidden><video id="sv" playsinline muted></video><div class="fr"></div><p id="sm">Apuntá al código de barras de la contratapa</p><div class="row"><button type="button" id="sph">📸 Sacar foto</button><button type="button" id="scx">Cancelar</button></div></div>
 <input id="sf" type="file" accept="image/*" capture="environment" hidden>
+<input id="cf" type="file" accept="image/*" multiple hidden>
 <div id="vs" class="setup" hidden>
  <img src="icon-192.png" alt="">
  <div class="panel"><h2>Conectar con tu Google Sheets</h2>
@@ -113,6 +116,7 @@ details summary{cursor:pointer;padding:8px 0}
 <div id="mp" class="panel" hidden></div>
 <div id="ap" class="panel" hidden><h2>Agregar un libro</h2>
 <button type="button" id="sa" class="scanbig">📷 Escanear código de barras</button>
+<button type="button" id="sca" class="scanbig alt">🖼 Desde una captura de la galería</button>
 <p id="sinfo" class="stats" hidden></p>
 <form id="add"><div class="seg" id="ne"><button type="button" data-e="leido" class="on">Leído</button><button type="button" data-e="leyendo">Leyendo</button><button type="button" data-e="quiero">Quiero leer</button></div>
 <div class="row"><input id="ni" placeholder="ISBN o título" autocomplete="off" style="flex:2"><button type="button" id="nb" style="flex:1;padding:12px">Buscar datos</button></div><input id="nt" placeholder="Título" required autocomplete="off"><input id="na" placeholder="Autor" required autocomplete="off">
@@ -130,16 +134,29 @@ details summary{cursor:pointer;padding:8px 0}
 <p class="stats" style="margin-top:14px">ISBN de los libros que ya tenías: los busca en Google Books y elige la edición más cercana anterior a tu fecha de lectura. Tarda unos minutos; dejá la app abierta.</p>
 <div class="row"><button type="button" id="fi">Completar ISBN faltantes</button></div>
 <p class="stats" style="margin-top:14px">Con el libro en la mano: escaneás el código (o le sacás una foto) y se completa su ficha en la planilla: ISBN real y, si estaba estimado, el subgénero.</p>
-<div class="row"><button type="button" id="fs" class="pri">📷 Escanear mis libros</button></div><p class="stats" id="fis"></p>
+<div class="row"><button type="button" id="fsh" class="pri">📷 Escanear mis libros</button></div><p class="stats" id="fis"></p>
 <p class="stats" style="margin:14px 0 6px">Apariencia</p>
 <div class="seg" id="thm"><button type="button" data-t="">Automática</button><button type="button" data-t="light">Clara</button><button type="button" data-t="dark">Oscura</button></div>
-<p class="stats" style="margin:10px 0 4px">Versión de la app: <b>16</b> · <button type="button" id="upd">Forzar actualización</button></p>
+<p class="stats" style="margin:10px 0 4px">Versión de la app: <b>17</b> · <button type="button" id="upd">Forzar actualización</button></p>
 <div class="row" style="margin-top:8px"><button type="button" id="dc">Desconectar este dispositivo</button><button type="button" id="sx" class="pri">Cerrar</button></div></div>
 
-<div id="v1">
+<div id="v0">
+<h2 class="hd">Resumen</h2>
+<div class="kpis"><div class="kpi"><b id="k1">–</b><span id="k1l">leídos este año</span></div><div class="kpi"><b id="k2">–</b><span>leídos desde 2019</span></div><div class="kpi"><b id="k3">–</b><span>leyendo ahora</span></div></div>
+<div id="hl" class="pl"></div>
+<p class="stats" id="sync0" style="text-align:center;margin-top:18px"></p>
+</div>
+
+<div id="v1" hidden>
 <div class="sr"><input id="q" type="search" placeholder="Título o autor…" autocomplete="off"><button id="sq" class="scan" title="Escanear código de barras" aria-label="Escanear código de barras">📷</button></div>
 <div id="res"></div>
+<p class="stats" id="qh" style="text-align:center;margin-top:28px">Escribí un título o un autor, o escaneá el código de barras, para saber si ya lo leíste.</p>
+</div>
+
+<div id="v4" hidden>
+<div class="seg" id="lv" style="margin:12px 0 4px"><button type="button" data-l="leido" class="on">Leídos</button><button type="button" data-l="leyendo">Leyendo</button><button type="button" data-l="quiero">Quiero leer</button></div>
 <div id="pl"></div>
+<div id="lt">
 <div class="bar">
  <select id="fy"><option value="">Todos los años</option></select>
  <select id="fg"><option value="">Ficción y no ficción</option><option>Ficción</option><option>No ficción</option></select>
@@ -148,6 +165,7 @@ details summary{cursor:pointer;padding:8px 0}
 <div class="wrap"><table><thead><tr>
 <th data-k="c">N°</th><th data-k="t">Título</th><th data-k="a">Autor</th><th data-k="g">Género</th><th data-k="d">Fecha</th></tr></thead><tbody id="tb"></tbody></table></div>
 <div id="foot" class="foot"></div>
+</div>
 </div>
 
 <div id="v2" hidden>
@@ -162,8 +180,10 @@ details summary{cursor:pointer;padding:8px 0}
 <div id="foot2" class="foot"></div>
 </div>
 <nav class="tabs" aria-label="Secciones">
-<button id="t1" class="on" type="button"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Buscar</button>
+<button id="t0" class="on" type="button"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>Home</button>
+<button id="t1" type="button"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Buscar</button>
 <button id="t3" class="add" type="button" aria-label="Agregar libro"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Agregar</span></button>
+<button id="t4" type="button"><svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v15H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h14"/><path d="M8 7.5h8"/></svg>Libros</button>
 <button id="t2" type="button"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Dashboard</button>
 </nav>
 </div>
@@ -209,7 +229,7 @@ function vista(){let l=books.map(b=>Object.assign({},b));
   else if(it.action==="del")l=l.filter(x=>clave(x)!==clave(it))}
  return l.filter(b=>!borrando.has(clave(b)))}
 function setBooks(b){books=b;store.set("books",b);store.set("at",Date.now());refresh()}
-function status(t){$("sync").textContent=t}
+function status(t){$("sync").textContent=t;$("sync0").textContent=t}
 async function load(){if(!cfg)return;status("Sincronizando…");
  await subir();
  try{setBooks(await api());estadoSync(false)}
@@ -251,7 +271,7 @@ $("dc").onclick=()=>{if($("dc").dataset.ok!=="1"){$("dc").dataset.ok="1";$("dc")
 function refresh(){fillYears();draw();search();lecturas();if(!$("v2").hidden){fixed();pv()}}
 function fillYears(){const cur=$("fy").value,ys=[...new Set(books.map(b=>b.y).filter(Boolean))].sort();
  $("fy").innerHTML='<option value="">Todos los años</option>'+ys.map(y=>`<option${String(y)===cur?" selected":""}>${y}</option>`).join("")}
-function search(){const q=nrm($("q").value),r=$("res");
+function search(){const q=nrm($("q").value),r=$("res");$("qh").hidden=q.length>=2;
  if(q.length<2){r.innerHTML="";return}
  const tk=q.split(" "),h=all().filter(b=>tk.every(t=>b.k.includes(t))),p=porLeer().filter(b=>tk.every(t=>b.k.includes(t)));
  let html=h.length?`<div class="verdict ok">✔ Sí, ya lo leíste (${h.length} coincidencia${h.length>1?"s":""})</div>`:p.length?`<div class="verdict info">${est(p[0])==="leyendo"?"📖 Lo estás leyendo":"📚 Está en tu lista «Quiero leer»"}: ${esc(p[0].t)}</div>`:`<div class="verdict no">✘ No figura en tu lista</div><button class="addq" id="addq">＋ Agregarlo</button>`;
@@ -265,11 +285,20 @@ function draw(){let l=all();const y=$("fy").value,g=$("fg").value;
  $("st").textContent=l.length+" libros";foot();
  $("tb").innerHTML=l.map(b=>`<tr${b.pend?' class="pend"':""}><td>${b.c||"⏳"}</td><td>${esc(b.t)}</td><td>${esc(b.a)}</td><td>${esc(b.g||"")}</td><td>${fmt(b.d)||b.y||""}${sup(b.c)} ${b.pend?"":`<button data-del="${esc(clave(b))}" title="Quitar" aria-label="Quitar ${esc(b.t)}">✕</button>`}</td></tr>`).join("")}
 // «Leyendo ahora» y «Quiero leer», arriba de la tabla.
-function lecturas(){const l=porLeer(),ly=l.filter(b=>est(b)==="leyendo"),qq=l.filter(b=>est(b)==="quiero"),el=$("pl");
+let vistaLib="leido";
+document.querySelectorAll("#lv button").forEach(b=>b.onclick=()=>{vistaLib=b.dataset.l;lecturas();window.scrollTo(0,0)});
+function lecturas(){const l=porLeer(),ly=l.filter(b=>est(b)==="leyendo"),qq=l.filter(b=>est(b)==="quiero"),el=$("pl"),le=all();
  const fila=(b,bot)=>`<div class="bk${b.pend?" pend":""}"><div><b>${esc(b.t)}</b><span>${esc(b.a)}${b.di?" · empezado el "+fmt(b.di):""}${b.pend?'<i class="chip">sin subir</i>':""}</span></div>${b.pend?"":bot+`<button type="button" data-del="${esc(clave(b))}" aria-label="Quitar ${esc(b.t)}">✕</button>`}</div>`;
- el.className="pl";el.innerHTML=(ly.length?`<h3>📖 Leyendo ahora</h3>`+ly.map(b=>fila(b,`<button type="button" class="pri" data-fin="${esc(clave(b))}">✓ Terminado</button>`)).join(""):"")+
-  (qq.length?`<details${qq.length<=5?" open":""}><summary><h3 style="display:inline">📚 Quiero leer (${qq.length})</h3></summary>`+qq.map(b=>fila(b,`<button type="button" data-emp="${esc(clave(b))}">Empezar</button>`)).join("")+"</details>":"")}
-$("pl").onclick=e=>{const t=e.target.closest("button");if(!t)return;const b=porLeer().find(x=>clave(x)===(t.dataset.fin||t.dataset.emp||t.dataset.del));if(!b)return;
+ const fin=b=>`<button type="button" class="pri" data-fin="${esc(clave(b))}">✓ Terminado</button>`,emp=b=>`<button type="button" data-emp="${esc(clave(b))}">Empezar</button>`;
+ const y=new Date().getFullYear();$("k1").textContent=le.filter(b=>b.y===y).length;$("k1l").textContent="leídos en "+y;
+ $("k2").textContent=le.filter(b=>b.y>=2019).length;$("k3").textContent=ly.length;
+ $("hl").innerHTML=ly.length?`<h3>📖 Estoy leyendo</h3>`+ly.map(b=>fila(b,fin(b))).join(""):`<h3>📖 Estoy leyendo</h3><div class="vacio">No tenés ningún libro empezado.<br>Tocá <b>+</b> y elegí «Leyendo».</div>`;
+ document.querySelectorAll("#lv button").forEach(b=>{const n={leido:le.length,leyendo:ly.length,quiero:qq.length}[b.dataset.l];b.textContent={leido:"Leídos",leyendo:"Leyendo",quiero:"Quiero leer"}[b.dataset.l]+" ("+n+")";b.classList.toggle("on",b.dataset.l===vistaLib)});
+ $("lt").hidden=vistaLib!=="leido";el.className="pl";
+ const sel=vistaLib==="leyendo"?ly:vistaLib==="quiero"?qq:null;
+ el.innerHTML=(vistaLib==="quiero"?`<button type="button" class="scanbig" data-cap="1" style="margin-top:10px">🖼 Agregar desde capturas de pantalla</button><p class="stats" style="margin:4px 2px 0">Elegí una o varias capturas de tu galería: leo el título y el autor, y los guardo acá.</p>`:"")+(!sel?"":sel.length?sel.map(b=>fila(b,vistaLib==="leyendo"?fin(b):emp(b))).join(""):`<div class="vacio" style="margin-top:10px">${vistaLib==="leyendo"?"No estás leyendo ningún libro.":"Tu lista «Quiero leer» está vacía."}<br>Tocá <b>+</b> para agregar uno.</div>`);
+}
+$("hl").onclick=$("pl").onclick=e=>{const t=e.target.closest("button");if(!t)return;if(t.dataset.cap){capDesde="lista";$("cf").value="";$("cf").click();return}const b=porLeer().find(x=>clave(x)===(t.dataset.fin||t.dataset.emp||t.dataset.del));if(!b)return;
  if(t.dataset.del){quitar(b);return}
  const base={action:"update",c:b.c,t:b.t,a:b.a};
  if(t.dataset.fin){encolar(Object.assign(base,{e:"leido",d:today()})).then(()=>{const n=books.find(x=>x.t===b.t&&x.a===b.a&&est(x)==="leido");toast(n?`✔ ¡Terminado! Quedó como N° ${n.c}`:"✔ Terminado · se sube cuando haya conexión")})}
@@ -279,7 +308,7 @@ document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.d
 
 /* ---------- agregar y quitar ---------- */
 function openAdd(t){$("t3").classList.add("on");ponerEstado("leido");$("ndi").value="";$("sp").hidden=true;$("mp").hidden=true;$("ap").hidden=false;$("nt").value=t||"";$("na").value="";$("ni").value="";$("ns").value="A revisar";$("sinfo").hidden=true;$("nd").value=today();window.scrollTo(0,0);(t?$("na"):$("nt")).focus()}
-function closeAdd(){$("ap").hidden=true;$("add").reset();$("t3").classList.remove("on")}
+function closeAdd(){$("ap").hidden=true;$("add").reset();$("t3").classList.remove("on");if(revisar.length)setTimeout(()=>revisarCaptura(revisar.shift()),350)}
 $("t3").onclick=()=>$("ap").hidden?openAdd(""):closeAdd();$("cx").onclick=closeAdd;
 let estadoNuevo="leido";
 function ponerEstado(e){estadoNuevo=e;document.querySelectorAll("#ne button").forEach(b=>b.classList.toggle("on",b.dataset.e===e));
@@ -289,7 +318,7 @@ $("add").onsubmit=async e=>{e.preventDefault();
  const sub=$("ns").value,es=estadoNuevo,b={t:$("nt").value.trim(),a:$("na").value.trim(),g:GEN[sub]||"A revisar",s:sub,i:toIsbn($("ni").value)||"",e:es,
   d:es==="leido"?($("nd").value||today()):"",di:es==="quiero"?"":$("ndi").value||(es==="leyendo"?today():"")};
  const btn=e.submitter||e.target.querySelector(".pri");cargando(btn,"Guardando…");
- const n0=cola.length;closeAdd();tab(1);$("q").value=b.t;
+ const n0=cola.length;closeAdd();if(es==="leido"){tab(1);$("q").value=b.t}else if(es==="leyendo")tab(0);else{vistaLib="quiero";tab(4)}
  await encolar({action:"add",book:b});listo(btn);search();
  const que=es==="leido"?"Agregado":es==="leyendo"?"Agregado a «Leyendo»":"Agregado a «Quiero leer»";
  toast(cola.length>n0?`⏳ ${que} en el teléfono · se sube a la planilla cuando haya conexión`:`✔ ${que}: ${b.t}`)};
@@ -330,8 +359,9 @@ function pv(){const rd=dims[$("dr").value],cd=dims[$("dc2").value],L=all(),rows=
 $("pv").onclick=e=>{const t=e.target.closest("td");if(!t||t.dataset.r===undefined)return;const rd=dims[$("dr").value],cd=dims[$("dc2").value];
  const l=all().filter(b=>String(rd[1](b))===t.dataset.r&&(!cd||t.dataset.c===undefined||String(cd[1](b))===t.dataset.c));
  $("dd").innerHTML=`<p class="stats">${l.length} libro${l.length>1?"s":""}: ${esc(t.dataset.r)}${t.dataset.c?" · "+esc(t.dataset.c):""}</p>`+l.map(b=>`<div class="hit"><b>${esc(b.t)}</b><span>${esc(b.a)} · N° ${b.c}</span></div>`).join("")};
-function tab(n){$("v1").hidden=n!==1;$("v2").hidden=n!==2;$("t1").classList.toggle("on",n===1);$("t2").classList.toggle("on",n===2);if(n===2){fixed();pv()}}
-$("t1").onclick=()=>{if(!$("ap").hidden)closeAdd();tab(1);window.scrollTo(0,0)};$("t2").onclick=()=>{if(!$("ap").hidden)closeAdd();tab(2);window.scrollTo(0,0)};
+function tab(n){$("sp").hidden=true;$("mp").hidden=true;if(!$("ap").hidden)closeAdd();
+ [0,1,2,4].forEach(i=>{$("v"+i).hidden=n!==i;$("t"+i).classList.toggle("on",n===i)});if(n===2){fixed();pv()}window.scrollTo(0,0)}
+[0,1,2,4].forEach(i=>$("t"+i).onclick=()=>tab(i));
 // Con el teclado abierto, la barra de abajo se esconde para no tapar lo que escribís.
 document.addEventListener("focusin",e=>{if(e.target.matches("input:not([type=date]),textarea"))document.body.classList.add("kb")});
 document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(!a||!a.matches("input:not([type=date]),textarea"))document.body.classList.remove("kb")},100));
@@ -577,7 +607,7 @@ function prefill(isbn,m){
  info(dup?"⚠ Ojo: ya tenés uno con ese título (N° "+dup.c+"). Revisá antes de guardar.":(m.src?"Datos de "+m.src:"Datos cargados")+(s?", subgénero sugerido":"")+". Revisalos antes de guardar.")}
 function info(t){$("sinfo").textContent=t;$("sinfo").hidden=false}
 $("sq").onclick=()=>startScan("search");
-$("fs").onclick=()=>{$("sp").hidden=true;startScan("shelf")};
+$("fsh").onclick=()=>{$("sp").hidden=true;startScan("shelf")};
 $("sa").onclick=()=>startScan("add");
 // "Buscar datos": con un ISBN busca esa edición; con texto (en el campo de arriba o en Título) busca por título y autor.
 $("nb").onclick=()=>{const v=$("ni").value.trim(),i=toIsbn(v);
@@ -605,6 +635,85 @@ async function byTitle(t,a){info("Buscando «"+t+"»…");
   $("nt").value=r.tm;$("na").value=r.a;$("ni").value=keep||r.i||"";const s=suggest(r.cats);if(s)$("ns").value=s;
   const dup=all().find(x=>nrm(x.t)===nrm(r.tm));
   info(dup?"⚠ Ojo: ya tenés uno con ese título (N° "+dup.c+"). Revisá antes de guardar.":"Datos de "+r.src+(s?", subgénero sugerido":"")+". Revisalos antes de guardar.")})}
+
+/* ---------- capturas de pantalla → libro ----------
+   Lee el texto de la imagen en el teléfono (Tesseract), busca ese texto en Google Books, Open Library y la web,
+   y se queda con el libro cuyo título y autor aparecen en la captura. */
+let tess=null,capDesde="lista",revisar=[],capProg=null;
+function tesseract(){if(tess)return tess;
+ tess=new Promise(ok=>{if(window.Tesseract)return ok(window.Tesseract);const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";s.onload=()=>ok(window.Tesseract||null);s.onerror=()=>ok(null);document.head.appendChild(s)})
+  .then(T=>T&&T.createWorker("spa+eng",1,{logger:m=>{if(m.status==="recognizing text"&&capProg)capProg(m.progress)}})).catch(()=>null)
+  .then(w=>{if(!w)tess=null;return w});return tess}
+const BASURA=/^\d{1,2}[:.]\d{2}\b|%|\$|\bprecio|env[ií]o|cuotas|comprar|carrito|agregar|seguir|me gusta|compartir|comentar|stock|ver m[aá]s|https?:|www\.|\.com|@|\blte\b|\b[45]g\b|mercado ?libre|instagram|amazon|goodreads|buscalibre|buscar|inicio|vendido|opiniones|calificaci|estrellas|disponible|tapa (blanda|dura)|formato|idioma|p[aá]ginas|publicidad|patrocinad|historias|respuestas|enviar|mensaje/i;
+const VACIAS=new Set("el la los las de del y en un una al por con sin para que como the of and a an to in on se su sus lo le mi tu".split(" "));
+function lineasOCR(data){const out=[];
+ for(const l of data.lines||[]){let t=(l.text||"").replace(/[|_~»«•·*#<>=\[\]{}©®™"“”]/g," ").replace(/\s+/g," ").trim();
+  t=t.replace(/^(autor(a)?|de|por|by|escrito por)\s*:?\s+/i,"");
+  const letras=(t.match(/[A-Za-zÁÉÍÓÚÑÜáéíóúñü]/g)||[]).length;
+  if(letras<3||letras/t.length<.6||l.confidence<45||BASURA.test(t)||t.split(" ").length>12)continue;
+  out.push({t,h:l.bbox.y1-l.bbox.y0})}
+ return out.sort((a,b)=>b.h-a.h)}
+function lev(a,b){if(Math.abs(a.length-b.length)>1)return 9;const d=[...Array(b.length+1).keys()];
+ for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return d[b.length]}
+// Qué tanto aparece el libro r en el texto leído: proporción de palabras del título y si figura el apellido del autor.
+function puntaje(r,texto){const W=texto.split(" "),hay=w=>W.includes(w)||(w.length>5&&W.some(x=>lev(x,w)<=1));
+ let tk=nrm(r.t).split(" ").filter(w=>w.length>2&&!VACIAS.has(w));if(!tk.length)tk=nrm(r.t).split(" ").filter(Boolean);
+ const ti=tk.length?tk.filter(hay).length/tk.length:0;
+ const ap=nrm((r.a||"").split(/&|,| y /)[0]).split(" ").filter(w=>w.length>2).pop();
+ const au=ap&&hay(ap)?1:0;return{ti,au,n:tk.length,s:ti*.7+au*.3}}
+async function candidatosTexto(q){const res=[];
+ const srv=cfg?(async()=>{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),20000);try{return await fetch(cfg.u,{method:"POST",signal:ac.signal,body:JSON.stringify({k:cfg.k,action:"buscarTexto",q})}).then(x=>x.json())}catch(e){return null}finally{clearTimeout(tm)}})():Promise.resolve(null);
+ const ol=getJSON("https://openlibrary.org/search.json?limit=6&fields=title,author_name,isbn,subject&q="+encodeURIComponent(q));
+ const [r,o]=await Promise.all([srv,ol]);
+ if(r&&r.ok){(r.books||[]).forEach(b=>res.push(b));parseWeb(r.web||[]).forEach(c=>res.push(Object.assign({src:"la web"},c)))}
+ else{const g=await getJSON("https://www.googleapis.com/books/v1/volumes?maxResults=8&printType=books&q="+encodeURIComponent(q));
+  for(const it of(g&&g.items)||[]){const v=it.volumeInfo||{};let i="";for(const x of v.industryIdentifiers||[]){const c=toIsbn(x.identifier);if(c&&(x.type==="ISBN_13"||!i))i=c}
+   if(v.title)res.push({t:v.title,a:(v.authors||[]).join(" & "),cats:v.categories||[],i,src:"Google Books"})}}
+ for(const d of(o&&o.docs)||[])if(d.title)res.push({t:d.title,a:(d.author_name||[]).join(" & "),cats:(d.subject||[]).slice(0,10),i:toIsbn(((d.isbn||[]).find(x=>toIsbn(x)))||""),src:"Open Library"});
+ return res}
+async function leerCaptura(file,prog){
+ const url=URL.createObjectURL(file);
+ // 1) ¿Se ve un código de barras o un ISBN escrito?
+ let isbn=await decodePhoto(file).catch(()=>"");
+ const w=await tesseract();if(!w&&!isbn)return{url,error:"No pude cargar el lector de texto. Revisá la conexión y probá de nuevo."};
+ let data={lines:[],text:""};
+ if(w){capProg=prog;try{data=(await w.recognize(file)).data}catch(e){}capProg=null}
+ const texto=nrm(data.text||"");
+ if(!isbn){const m=(data.text||"").replace(/[‐-]/g,"-").match(/(?:97[89][\d\- ]{10,16}|\b\d{9}[\dXx]\b)/g)||[];for(const x of m){const i=toIsbn(x.replace(/[\s-]/g,""));if(i){isbn=i;break}}}
+ if(isbn){const m=await lookup(isbn);if(m&&m.t)return{url,m:Object.assign({i:isbn},m),seguro:true,isbn}}
+ const L=lineasOCR(data);if(!L.length)return{url,error:"No encontré texto legible en la imagen."};
+ const c=L.slice(0,4).map(x=>x.t),qs=[...new Set([c[0]+(c[1]?" "+c[1]:""),c[0],c[1]&&c[2]?c[1]+" "+c[2]:""].filter(Boolean))];
+ let mejor=null;
+ for(const q of qs){const lista=await candidatosTexto(q);
+  for(const r of lista){const p=puntaje(r,texto);if(!mejor||p.s>mejor.p.s||(p.s===mejor.p.s&&!mejor.r.i&&r.i))mejor={r,p}}
+  if(mejor&&mejor.p.ti>=.8&&mejor.p.au)break}
+ const seguro=!!mejor&&mejor.p.ti>=.8&&(mejor.p.au===1||(mejor.p.ti===1&&mejor.p.n>=3));
+ if(mejor&&mejor.p.s>=.45)return{url,m:mejor.r,seguro,isbn:""};
+ return{url,guess:{t:fixCase(c[0]),a:c[1]&&/^[A-ZÁÉÍÓÚÑ][^\d]{3,40}$/.test(c[1])&&c[1].split(" ").length<=4?fixCase(c[1]):""}}}
+function libroDe(m,e){const s=suggest(m.cats)||"A revisar";return{t:fixCase(m.t),a:m.a||"",g:GEN[s]||"A revisar",s,i:toIsbn(m.i||"")||"",e,d:"",di:e==="leyendo"?today():""}}
+const yaEsta=t=>vista().find(b=>nrm(b.t)===nrm(t));
+function revisarCaptura(r){openAdd("");ponerEstado(r.e||"quiero");
+ const m=r.m||r.guess||{};$("nt").value=m.t?fixCase(m.t):"";$("na").value=m.a||"";$("ni").value=toIsbn(m.i||"")||"";
+ const s=suggest(m.cats);if(s)$("ns").value=s;
+ const dup=m.t&&yaEsta(m.t);const el=$("sinfo");el.hidden=false;
+ el.innerHTML=`<div class="capt"><img src="${r.url}" alt="Captura"><div>${r.n?`<b>Captura ${r.n}</b><br>`:""}${r.error?esc(r.error)+" Completalo a mano.":dup?"⚠ Ya tenés un libro con ese título. Revisá antes de guardar.":r.m?(r.seguro?"Datos de "+esc(r.m.src||"la búsqueda")+". Revisalos y guardá.":"No estoy seguro de que sea este libro: revisalo antes de guardar."):"No lo encontré en las bases de datos. Puse lo que leí en la imagen: corregilo y guardá."}${revisar.length?`<br><span>Quedan ${revisar.length} para revisar.</span>`:""}</div></div>`;
+ if(!$("nt").value)$("nt").focus()}
+$("sca").onclick=()=>{capDesde="form";$("cf").value="";$("cf").click()};
+$("cf").onchange=async()=>{const fs=[...$("cf").files];if(!fs.length)return;
+ const enForm=capDesde==="form",e=enForm?estadoNuevo:"quiero";
+ if(enForm){info("🖼 Leyendo la captura…")}
+ let ok=0,rep=0;const pend=[];
+ for(let n=0;n<fs.length;n++){const pre=fs.length>1?`Captura ${n+1} de ${fs.length}`:"Captura";
+  toast(`🖼 ${pre}: leyendo…`,false,null,60000);
+  const r=await leerCaptura(fs[n],p=>{const t=`🖼 ${pre}: leyendo el texto… ${Math.round(p*100)}%`;toast(t,false,null,60000);if(enForm)info(t)});
+  r.e=e;if(fs.length>1)r.n=`${n+1} de ${fs.length}`;
+  if(enForm){$("toast").hidden=true;const keep=$("ni").value;revisarCaptura(r);if(!r.m&&!r.guess&&keep)$("ni").value=keep;return}
+  if(r.m&&r.seguro){if(yaEsta(r.m.t)){rep++;continue}await encolar({action:"add",book:libroDe(r.m,e)});ok++}
+  else pend.push(r)}
+ vistaLib="quiero";tab(4);
+ const partes=[ok?`✔ ${ok} guardado${ok>1?"s":""} en «Quiero leer»`:"",rep?`${rep} ya estaba${rep>1?"n":""}`:"",pend.length?`${pend.length} para revisar`:""].filter(Boolean);
+ toast(partes.join(" · ")||"No encontré libros en esas imágenes",!ok&&!pend.length);
+ if(pend.length){revisar=pend.slice(1);setTimeout(()=>revisarCaptura(pend[0]),600)}};
 
 // Generador de códigos QR (modo byte, corrección M), basado en el algoritmo de referencia de Nayuki.
 function qrMatriz(texto){
