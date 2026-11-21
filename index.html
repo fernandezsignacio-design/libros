@@ -375,7 +375,7 @@ async function found(isbn){
  if(scanMode==="search"){
   if(ya){$("q").value=ya.t;search();return}
   toast("Buscando el libro…");const m=await lookup(isbn);
-  if(!m){$("q").value="";search();toast("No encontré datos para ese ISBN ("+isbn+"). Buscalo por título.",true);return}
+  if(!m){$("q").value="";search();if(!google(isbn))location.href=gURL(isbn);return}
   $("toast").hidden=true;$("q").value=m.t;search();return}
  if(ya&&!mk(ya.c).split(",").includes("6")){
   if(scanMode==="shelf"){showDone(ya,"ya estaba completo");return}
@@ -409,12 +409,16 @@ async function saveMatch(b,isbn,estS){const body={action:"update",c:b.c,i:isbn,u
 function showDone(b,txt){const p=$("mp");p.innerHTML=`<h2>✔ N° ${b.c} ${txt}</h2><p style="margin:6px 0">${esc(b.t)} · <span class="stats">${esc(b.a)}</span></p>
  <div class="row"><button type="button" id="mpx">Listo</button><button type="button" id="mpn" class="pri">📷 Escanear el siguiente</button></div>`;p.hidden=false;
  $("mpx").onclick=()=>p.hidden=true;$("mpn").onclick=()=>startScan(scanMode==="search"?"add":scanMode)}
-function showNone(isbn){const p=$("mp");p.innerHTML=`<h2>No lo encontré</h2><p class="stats">No hay datos para el ISBN ${isbn} y no pude saber cuál de tus libros es. Buscalo en la tabla y cargá el ISBN en la planilla, o agregalo como libro nuevo.</p>
+function showNone(isbn){const p=$("mp");p.innerHTML=`<h2>No lo encontré</h2><p class="stats">No hay datos para el ISBN ${isbn} en las bases de libros, así que no pude saber cuál de tus libros es. <a href="${gURL(isbn)}" target="_blank" rel="noopener"><b>🔎 Buscarlo en Google</b></a></p>
  <div class="row"><button type="button" id="mpx">Cerrar</button><button type="button" id="mpn" class="pri">📷 Escanear el siguiente</button></div>`;p.hidden=false;
  $("mpx").onclick=()=>p.hidden=true;$("mpn").onclick=()=>startScan("shelf")}
 async function fill(isbn){info("Buscando datos del ISBN "+isbn+"…");prefill(isbn,await lookup(isbn))}
+const gURL=i=>"https://www.google.com/search?q="+encodeURIComponent("ISBN "+i);
+// Si las bases no lo tienen, abre la búsqueda de Google directamente (y deja el enlace por si el teléfono bloquea la ventana).
+function google(i){let w=null;try{w=window.open(gURL(i),"_blank")}catch(e){}return w}
 function prefill(isbn,m){
- if(!m){info("Leí el ISBN "+isbn+", pero no figura en Google Books ni en Open Library (pasa con muchas ediciones argentinas). Escribí el título en Título y tocá Buscar datos: el ISBN escaneado se mantiene.");$("nt").focus();return}
+ if(!m){google(isbn);const el=$("sinfo");el.hidden=false;
+  el.innerHTML=`Leí el ISBN ${isbn}, pero no está en Google Books ni en Open Library. Te abrí la búsqueda en Google: <a href="${gURL(isbn)}" target="_blank" rel="noopener"><b>🔎 Ver en Google</b></a>. Copiá el título y el autor acá y guardá: el ISBN escaneado se mantiene.`;return}
  $("nt").value=m.t;$("na").value=m.a;const s=suggest(m.cats);if(s)$("ns").value=s;
  const dup=all().find(b=>nrm(b.t)===nrm(m.t));
  info(dup?"⚠ Ojo: ya tenés uno con ese título (N° "+dup.c+"). Revisá antes de guardar.":(m.src?"Datos de "+m.src:"Datos cargados")+(s?", subgénero sugerido":"")+". Revisalos antes de guardar.")}
