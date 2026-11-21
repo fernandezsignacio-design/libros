@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mis libros leídos</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mis libros">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171716" media="(prefers-color-scheme: dark)">
+<style>
+:root{--bg:#faf9f6;--card:#fff;--tx:#1d1d1b;--mut:#6b6a66;--bd:#e3e0d8;--ok:#1b7a43;--okbg:#e4f4ea;--no:#a8321f;--nobg:#fbe9e5;--ac:#1f3864;--c1:#3b7dd8;--c2:#e0922f;--c3:#9a9a9a}
+@media (prefers-color-scheme:dark){:root{--bg:#171716;--card:#222220;--tx:#eeece6;--mut:#a09e97;--bd:#3a3935;--ok:#6fd49a;--okbg:#17301f;--no:#f0907d;--nobg:#3a1c16;--ac:#9db7ee}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);-webkit-tap-highlight-color:transparent}
+main{margin:0 auto;padding:12px 16px 32px;max-width:1200px}
+h1{font-size:20px;margin:4px 0 12px;display:flex;align-items:center;gap:8px}
+h1 img{width:30px;height:30px;border-radius:7px}
+h1 .sp{flex:1}
+#cfg{border:none;background:none;font-size:20px;padding:4px 6px;cursor:pointer;color:var(--mut)}
+#q{width:100%;font-size:18px;padding:14px 16px;border:2px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx)}
+#q:focus{outline:none;border-color:var(--ac)}
+.verdict{margin:12px 0;padding:14px 16px;border-radius:12px;font-weight:600}
+.ok{background:var(--okbg);color:var(--ok)}.no{background:var(--nobg);color:var(--no)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:4px 12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:12px 0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px}.card h3{margin:0 0 8px;font-size:15px}
+.lg{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--mut);justify-content:center}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
+.hb{display:grid;grid-template-columns:minmax(90px,38%) 1fr 28px;gap:8px;align-items:center;font-size:13px;margin:4px 0}.hb div.b{height:12px;border-radius:6px;background:var(--c1)}.hb span:first-child{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hit{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;margin:8px 0}.hit b{display:block}.hit span{color:var(--mut);font-size:14px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 8px;align-items:center}
+select,button,input{font:inherit;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx)}
+button{cursor:pointer}
+.stats{color:var(--mut);font-size:14px}
+.wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{padding:8px 10px;text-align:center;border-bottom:1px solid var(--bd);vertical-align:top}
+th{cursor:pointer;white-space:nowrap;position:sticky;top:0;background:var(--card)}
+[hidden]{display:none!important}.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+#pv td.lb,#pv td[data-r]{cursor:pointer}
+label{display:flex;gap:6px;align-items:center;font-size:14px;color:var(--mut)}
+#t3{margin-left:auto;background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:600}
+.panel{background:var(--card);border:2px solid var(--ac);border-radius:12px;padding:14px;margin:0 0 14px}
+.panel h2{font-size:16px;margin:0 0 8px}.panel form{display:grid;gap:8px}.panel input,.panel select{font-size:17px;padding:12px;width:100%}
+.row{display:flex;gap:8px}.row button{flex:1;padding:12px;font-size:16px}.pri{background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:600}
+.addq{margin-top:8px;width:100%;padding:12px;font-size:16px;font-weight:600;background:var(--card);color:var(--ac);border:2px dashed var(--ac);border-radius:12px}
+.toast{margin:0 0 12px;padding:12px 14px;border-radius:12px;background:var(--okbg);color:var(--ok);font-weight:600}
+.toast.err{background:var(--nobg);color:var(--no)}
+.setup{max-width:520px;margin:40px auto}.setup img{width:96px;height:96px;border-radius:22px;display:block;margin:0 auto 16px}
+code{font-size:13px;word-break:break-all}
+.sr{display:flex;gap:8px}.sr #q{flex:1}.scan{font-size:22px;padding:0 14px;border:2px solid var(--bd);border-radius:12px;background:var(--card)}
+.scanbig{width:100%;padding:14px;font-size:17px;font-weight:600;margin-bottom:8px;background:var(--okbg);color:var(--ok);border:2px solid var(--ok);border-radius:12px}
+#sinfo{margin:0 0 8px}
+.sc{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0)}
+.sc video{width:100%;max-width:640px;border-radius:12px}.sc .fr{position:absolute;width:min(80vw,520px);height:22vw;max-height:180px;border:3px solid #6fd49a;border-radius:12px;pointer-events:none}
+.sc p{color:#fff;text-align:center}
+.hb[data-f]{cursor:pointer;border-radius:6px}.hb[data-f]:hover,.hb.act{background:var(--bd)}
+.pop{position:fixed;z-index:40;max-width:min(92vw,380px);max-height:50vh;overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px 12px;font-size:13px}
+.pop b{display:block;margin-bottom:6px;font-size:14px}.pop div{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-top:1px solid var(--bd)}.pop div span{color:var(--mut);white-space:nowrap}.sc .row{width:100%;max-width:640px}
+.foot{margin-top:14px;font-size:13px;color:var(--mut)}.foot p{margin:4px 0}.foot b{color:var(--tx)}sup{color:var(--ac);font-weight:600;margin-left:1px}
+</style></head><body><main>
+
+<div id="pop" class="pop" hidden></div>
+<div id="sc" class="sc" hidden><video id="sv" playsinline muted></video><div class="fr"></div><p id="sm">Apuntá al código de barras de la contratapa</p><div class="row"><button type="button" id="sph">📸 Sacar foto</button><button type="button" id="scx">Cancelar</button></div></div>
+<input id="sf" type="file" accept="image/*" capture="environment" hidden>
+<div id="vs" class="setup" hidden>
+ <img src="icon-192.png" alt="">
+ <div class="panel"><h2>Conectar con tu Google Sheets</h2>
+ <form id="fs"><input id="su" placeholder="Enlace de la app web (termina en /exec)" required autocomplete="off">
+ <input id="sk" placeholder="Clave" autocomplete="off">
+ <div class="row"><button class="pri">Conectar</button></div></form>
+ <p class="stats" id="se">Lo hacés una sola vez en cada dispositivo. Si tenés el código de conexión completo (enlace#clave), pegalo en el primer campo.</p></div>
+</div>
+
+<div id="va" hidden>
+<h1><img src="icon-192.png" alt="">¿Ya lo leí?<span class="sp"></span><button id="cfg" title="Ajustes" aria-label="Ajustes">⚙︎</button></h1>
+<div class="bar" style="margin-top:0"><button id="t1" class="on">Buscar</button><button id="t2">Dashboard</button><button id="t3">＋ Agregar libro</button></div>
+<div id="toast" class="toast" hidden></div>
+
+<div id="mp" class="panel" hidden></div>
+<div id="ap" class="panel" hidden><h2>Agregar un libro</h2>
+<button type="button" id="sa" class="scanbig">📷 Escanear código de barras</button>
+<p id="sinfo" class="stats" hidden></p>
+<form id="add"><div class="row"><input id="ni" placeholder="ISBN (opcional)" inputmode="numeric" autocomplete="off" style="flex:2"><button type="button" id="nb" style="flex:1;padding:12px">Buscar datos</button></div><input id="nt" placeholder="Título" required autocomplete="off"><input id="na" placeholder="Autor" required autocomplete="off">
+<select id="ns"><option value="A revisar" selected>Subgénero: a revisar</option><optgroup label="Ficción"><option>Novela</option><option>Policial y suspenso</option><option>Novela histórica</option><option>Cuentos</option><option>Guion y teatro</option></optgroup><optgroup label="No ficción"><option>Memorias y autobiografía</option><option>Biografía</option><option>Crónica y periodismo</option><option>Literatura de viajes</option><option>Historia</option><option>Política y actualidad</option><option>Ensayo</option><option>Deportes</option><option>Montañismo</option><option>Divulgación, negocios y autoayuda</option></optgroup></select>
+<label>Terminado el <input id="nd" type="date" style="flex:1"></label>
+<div class="row"><button type="button" id="cx">Cancelar</button><button class="pri">Guardar</button></div></form>
+<p class="stats" style="margin:8px 0 0">Se guarda en tu Google Sheets.</p></div>
+
+<div id="sp" class="panel" hidden><h2>Ajustes</h2>
+<p class="stats">Para conectar otro dispositivo, copiá este código y pegalo ahí cuando la app lo pida:</p>
+<p><code id="code"></code></p>
+<div class="row"><button type="button" id="cp">Copiar código</button><button type="button" id="rs">Actualizar ahora</button></div>
+<p class="stats" style="margin-top:14px">ISBN de los libros que ya tenías: los busca en Google Books y elige la edición más cercana anterior a tu fecha de lectura. Tarda unos minutos; dejá la app abierta.</p>
+<div class="row"><button type="button" id="fi">Completar ISBN faltantes</button></div>
+<p class="stats" style="margin-top:14px">Con el libro en la mano: escaneás el código (o le sacás una foto) y se completa su ficha en la planilla: ISBN real y, si estaba estimado, el subgénero.</p>
+<div class="row"><button type="button" id="fs" class="pri">📷 Escanear mis libros</button></div><p class="stats" id="fis"></p>
+<div class="row" style="margin-top:8px"><button type="button" id="dc">Desconectar este dispositivo</button><button type="button" id="sx" class="pri">Cerrar</button></div></div>
+
+<div id="v1">
+<div class="sr"><input id="q" type="search" placeholder="Título o autor…" autocomplete="off"><button id="sq" class="scan" title="Escanear código de barras" aria-label="Escanear código de barras">📷</button></div>
+<div id="res"></div>
+<div class="bar">
+ <select id="fy"><option value="">Todos los años</option></select>
+ <select id="fg"><option value="">Ficción y no ficción</option><option>Ficción</option><option>No ficción</option></select>
+ <span class="stats" id="st"></span> <span class="stats" id="sync"></span>
+</div>
+<div class="wrap"><table><thead><tr>
+<th data-k="c">N°</th><th data-k="t">Título</th><th data-k="a">Autor</th><th data-k="g">Género</th><th data-k="d">Fecha</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div id="foot" class="foot"></div>
+</div>
+
+<div id="v2" hidden>
+<div class="cards"><div class="card"><h3>Libros por año</h3><div id="c1"></div></div><div class="card"><h3>Género por año</h3><div id="c2"></div></div><div class="card"><h3>Top 10 autores</h3><div id="c3"></div></div><div class="card"><h3>Top 10 sub-géneros</h3><div id="c4"></div></div></div>
+<h3>Armá tu tabla dinámica</h3>
+<div class="bar"><label>Filas <select id="dr"><option value="y">Año</option><option value="a">Autor</option><option value="g">Género</option><option value="s">Sub-Género</option></select></label>
+<label>Columnas <select id="dc2"><option value="">Ninguna</option><option value="y">Año</option><option value="g" selected>Género</option><option value="s">Sub-Género</option></select></label>
+<label>Orden <select id="ds"><option value="t">Mayor a menor</option><option value="l" selected>Alfabético / cronológico</option></select></label></div>
+<p class="stats">Cantidad de libros. Tocá una fila o una celda para ver los títulos.</p>
+<div class="wrap"><table id="pv"></table></div>
+<div id="dd"></div>
+<div id="foot2" class="foot"></div>
+</div>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let cfg=store.get("cfg",null),books=store.get("books",[]),notes=store.get("notes",[]),busy=0;
+const nrm=s=>(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9ñ ]+/g," ").replace(/\s+/g," ").trim();
+const all=()=>books.map(b=>Object.assign({k:nrm(b.t+" "+b.a)},b));
+const fmt=d=>d?d.split("-").reverse().join("/"):"";
+const mk=c=>notes.filter(n=>n.c.includes(+c)).map(n=>n.m).join(",");
+const sup=c=>{const m=mk(c);return m?`<sup>${esc(m)}</sup>`:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+let sortK="c",asc=false;
+
+/* ---------- conexión con Google Sheets ---------- */
+async function api(body){
+ const r=body?await fetch(cfg.u,{method:"POST",body:JSON.stringify(Object.assign({k:cfg.k},body))})
+            :await fetch(cfg.u+"?action=list&k="+encodeURIComponent(cfg.k)+"&_="+Date.now());
+ const j=await r.json();if(!j.ok)throw new Error(j.error||"Error");notes=j.notes||[];store.set("notes",notes);return j.books}
+function setBooks(b){books=b;store.set("books",b);store.set("at",Date.now());refresh()}
+function status(t){$("sync").textContent=t}
+async function load(){if(!cfg)return;status("Sincronizando…");
+ try{setBooks(await api());status("Al día con tu Google Sheets")}
+ catch(e){status(navigator.onLine?"No se pudo conectar con la planilla":"Sin conexión · mostrando lo último guardado")}}
+function toast(t,err){const el=$("toast");el.textContent=t;el.classList.toggle("err",!!err);el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,4500)}
+
+/* ---------- configuración ---------- */
+function showApp(){$("vs").hidden=!!cfg;$("va").hidden=!cfg;if(cfg){$("code").textContent=cfg.u+"#"+cfg.k;refresh();load()}}
+$("fs").onsubmit=async e=>{e.preventDefault();let u=$("su").value.trim(),k=$("sk").value.trim();
+ if(u.includes("#")){[u,k]=[u.split("#")[0],u.split("#").slice(1).join("#")]}
+ if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(u)){$("se").textContent="El enlace tiene que empezar con https://script.google.com/";return}
+ if(!k){$("se").textContent="Falta la clave.";return}
+ $("se").textContent="Probando la conexión…";cfg={u,k};
+ try{const b=await api();store.set("cfg",cfg);setBooks(b);showApp()}
+ catch(x){cfg=null;$("se").textContent="No funcionó: revisá el enlace y la clave. ("+x.message+")"}};
+$("cfg").onclick=()=>{$("sp").hidden=!$("sp").hidden;$("ap").hidden=true};
+$("sx").onclick=()=>$("sp").hidden=true;
+$("rs").onclick=()=>{$("sp").hidden=true;load()};
+$("cp").onclick=async()=>{try{await navigator.clipboard.writeText($("code").textContent);$("cp").textContent="¡Copiado!"}catch(e){const r=document.createRange();r.selectNodeContents($("code"));getSelection().removeAllRanges();getSelection().addRange(r);$("cp").textContent="Seleccionado: copialo"}setTimeout(()=>$("cp").textContent="Copiar código",2500)};
+$("dc").onclick=()=>{if($("dc").dataset.ok!=="1"){$("dc").dataset.ok="1";$("dc").textContent="Tocá de nuevo para confirmar";return}
+ try{localStorage.clear()}catch(e){}cfg=null;books=[];$("sp").hidden=true;$("dc").dataset.ok="";$("dc").textContent="Desconectar este dispositivo";showApp()};
+
+/* ---------- búsqueda y tabla ---------- */
+function refresh(){fillYears();draw();search();if(!$("v2").hidden){fixed();pv()}}
+function fillYears(){const cur=$("fy").value,ys=[...new Set(books.map(b=>b.y).filter(Boolean))].sort();
+ $("fy").innerHTML='<option value="">Todos los años</option>'+ys.map(y=>`<option${String(y)===cur?" selected":""}>${y}</option>`).join("")}
+function search(){const q=nrm($("q").value),r=$("res");
+ if(q.length<2){r.innerHTML="";return}
+ const tk=q.split(" "),h=all().filter(b=>tk.every(t=>b.k.includes(t)));
+ let html=h.length?`<div class="verdict ok">✔ Sí, ya lo leíste (${h.length} coincidencia${h.length>1?"s":""})</div>`:`<div class="verdict no">✘ No figura en tu lista</div><button class="addq" id="addq">＋ Agregarlo como leído</button>`;
+ html+='<div class="grid">';h.forEach(b=>html+=`<div class="hit"><b>${esc(b.t)}</b><span>${esc(b.a)} · N° ${b.c}${b.d?" · leído el "+fmt(b.d):b.y?" · "+b.y:""}${sup(b.c)}</span></div>`);
+ r.innerHTML=html+"</div>";const aq=$("addq");if(aq)aq.onclick=()=>openAdd($("q").value.trim())}
+function foot(){const h=notes.length?"<b>Notas</b>"+notes.map(n=>`<p><sup>${esc(n.m)}</sup> ${esc(n.t)}${n.c.length?` <span>(N° ${esc(rng(n.c))})</span>`:""}</p>`).join(""):"";$("foot").innerHTML=h;$("foot2").innerHTML=h}
+const rng=a=>{const o=[];let s=a[0],p=a[0];for(const x of a.slice(1).concat([null])){if(x===p+1){p=x;continue}o.push(s===p?s:s+"–"+p);s=p=x}return o.join(", ")};
+function draw(){let l=all();const y=$("fy").value,g=$("fg").value;
+ if(y)l=l.filter(b=>String(b.y)===y);if(g)l=l.filter(b=>b.g===g);
+ l.sort((a,b)=>{let x=a[sortK]||"",z=b[sortK]||"";if(sortK==="c"){x=+x;z=+z}else{x=String(x).toLowerCase();z=String(z).toLowerCase()}return(x>z?1:x<z?-1:0)*(asc?1:-1)});
+ $("st").textContent=l.length+" libros";foot();
+ $("tb").innerHTML=l.map(b=>`<tr><td>${b.c}</td><td>${esc(b.t)}</td><td>${esc(b.a)}</td><td>${esc(b.g||"")}</td><td>${fmt(b.d)||b.y||""}${sup(b.c)} <button data-del="${b.c}" title="Quitar">✕</button></td></tr>`).join("")}
+$("q").addEventListener("input",search);$("fy").onchange=$("fg").onchange=draw;
+document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k;asc=sortK===k?!asc:true;sortK=k;draw()});
+
+/* ---------- agregar y quitar ---------- */
+function openAdd(t){$("sp").hidden=true;$("mp").hidden=true;$("ap").hidden=false;$("nt").value=t||"";$("na").value="";$("ni").value="";$("ns").value="A revisar";$("sinfo").hidden=true;$("nd").value=today();window.scrollTo(0,0);(t?$("na"):$("nt")).focus()}
+function closeAdd(){$("ap").hidden=true;$("add").reset()}
+$("t3").onclick=()=>$("ap").hidden?openAdd(""):closeAdd();$("cx").onclick=closeAdd;
+$("add").onsubmit=async e=>{e.preventDefault();
+ const d=$("nd").value||today(),sub=$("ns").value,b={t:$("nt").value.trim(),a:$("na").value.trim(),g:GEN[sub]||"A revisar",s:sub,d:d,i:toIsbn($("ni").value)||""};
+ const btn=e.submitter||e.target.querySelector(".pri");btn.disabled=true;btn.textContent="Guardando…";
+ try{setBooks(await api({action:"add",book:b}));closeAdd();tab(1);$("q").value=b.t;search();toast("✔ Agregado: "+b.t)}
+ catch(x){toast(navigator.onLine?"No se pudo guardar. Probá de nuevo.":"Sin conexión: no se pudo guardar.",true)}
+ finally{btn.disabled=false;btn.textContent="Guardar"}};
+$("tb").onclick=async e=>{const c=e.target.dataset&&e.target.dataset.del;if(!c)return;
+ if(e.target.dataset.ok!=="1"){e.target.dataset.ok="1";e.target.textContent="¿Quitar?";return}
+ e.target.textContent="…";try{setBooks(await api({action:"del",c:+c}));toast("Quitado de la lista")}catch(x){toast("No se pudo quitar.",true);draw()}};
+
+/* ---------- dashboard ---------- */
+const yk=b=>b.y?String(b.y):"Sin año";
+function stack(id,keys,names,rows,cols){const W=640,H=270,L=24,R=8,T=18,B=28,bw=(W-L-R)/Math.max(keys.length,1),tot=keys.map(k=>names.reduce((s,n)=>s+(rows[k][n]||0),0)),mx=Math.max(...tot,1),y=v=>H-B-(H-T-B)*v/mx;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">`;
+ keys.forEach((k,i)=>{let a=0;const x=L+i*bw+bw*.15,w=bw*.7;names.forEach((n,j)=>{const v=rows[k][n]||0;if(!v)return;s+=`<rect x="${x}" y="${y(a+v)}" width="${w}" height="${y(a)-y(a+v)}" fill="${cols[j]}"><title>${k} · ${n}: ${v}</title></rect>`;a+=v});
+  s+=`<text x="${x+w/2}" y="${y(a)-4}" text-anchor="middle" font-size="11" fill="currentColor">${a}</text><text x="${x+w/2}" y="${H-10}" text-anchor="middle" font-size="11" fill="currentColor">${k}</text>`});
+ s+=`<line x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}" stroke="currentColor" opacity=".3"/></svg>`;
+ if(names.length>1)s+=`<div class="lg">${names.map((n,j)=>keys.some(k=>rows[k][n])?`<span><i style="background:${cols[j]}"></i>${n}</span>`:"").join("")}</div>`;$(id).innerHTML=s}
+function hbars(id,list,f){const m=Math.max(...list.map(x=>x[1]),1);$(id).innerHTML=list.map(([k,v])=>`<div class="hb" data-f="${f}" data-k="${esc(k)}"><span>${esc(k)}</span><div class="b" style="width:${100*v/m}%"></div><span>${v}</span></div>`).join("")}
+function fixed(){const L=all(),ys=[...new Set(L.map(yk))].sort(),r1={},r2={};
+ ys.forEach(k=>{r1[k]={};r2[k]={}});
+ L.forEach(b=>{const k=yk(b);r1[k]["Libros"]=(r1[k]["Libros"]||0)+1;const g=b.g==="Ficción"||b.g==="No ficción"?b.g:"A revisar";r2[k][g]=(r2[k][g]||0)+1});
+ stack("c1",ys,["Libros"],r1,["var(--c1)"]);stack("c2",ys,["Ficción","No ficción","A revisar"],r2,["var(--c1)","var(--c2)","var(--c3)"]);
+ const top=f=>{const m={};L.forEach(b=>{const k=f(b);if(k&&k!=="A revisar")m[k]=(m[k]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,10)};
+ hbars("c3",top(b=>b.a),"a");hbars("c4",top(b=>b.s),"s")}
+const dims={a:["Autor",b=>b.a],y:["Año",b=>b.y||"Sin año"],g:["Género",b=>b.g||"Sin clasificar"],s:["Sub-Género",b=>b.s||"Sin clasificar"]};
+function pv(){const rd=dims[$("dr").value],cd=dims[$("dc2").value],L=all(),rows=new Map(),cols=new Set();
+ L.forEach(b=>{const r=String(rd[1](b)),c=cd?String(cd[1](b)):"";cols.add(c);if(!rows.has(r))rows.set(r,{t:0,c:{}});const o=rows.get(r);o.t++;o.c[c]=(o.c[c]||0)+1});
+ const cmp=(x,y)=>x.localeCompare(y,"es",{numeric:true}),ck=[...cols].sort(cmp);
+ const rk=[...rows.keys()].sort($("ds").value==="t"?(x,y)=>rows.get(y).t-rows.get(x).t||cmp(x,y):cmp);
+ const ct={};let tot=0;rows.forEach(o=>{tot+=o.t;for(const c in o.c)ct[c]=(ct[c]||0)+o.c[c]});
+ let h=`<thead><tr><th>${rd[0]}</th>${cd?ck.map(c=>`<th>${esc(c)}</th>`).join(""):""}<th>Total</th></tr></thead><tbody>`;
+ rk.forEach(r=>{const o=rows.get(r);h+=`<tr><td class="lb" data-r="${esc(r)}">${esc(r)}</td>${cd?ck.map(c=>`<td data-r="${esc(r)}" data-c="${esc(c)}">${o.c[c]||""}</td>`).join(""):""}<td><b>${o.t}</b></td></tr>`});
+ h+=`<tr><td class="lb"><b>Total</b></td>${cd?ck.map(c=>`<td><b>${ct[c]}</b></td>`).join(""):""}<td><b>${tot}</b></td></tr></tbody>`;
+ $("pv").innerHTML=h;$("dd").innerHTML=""}
+$("pv").onclick=e=>{const t=e.target.closest("td");if(!t||t.dataset.r===undefined)return;const rd=dims[$("dr").value],cd=dims[$("dc2").value];
+ const l=all().filter(b=>String(rd[1](b))===t.dataset.r&&(!cd||t.dataset.c===undefined||String(cd[1](b))===t.dataset.c));
+ $("dd").innerHTML=`<p class="stats">${l.length} libro${l.length>1?"s":""}: ${esc(t.dataset.r)}${t.dataset.c?" · "+esc(t.dataset.c):""}</p>`+l.map(b=>`<div class="hit"><b>${esc(b.t)}</b><span>${esc(b.a)} · N° ${b.c}</span></div>`).join("")};
+function tab(n){$("v1").hidden=n!==1;$("v2").hidden=n!==2;$("t1").classList.toggle("on",n===1);$("t2").classList.toggle("on",n===2);if(n===2){fixed();pv()}}
+$("t1").onclick=()=>tab(1);$("t2").onclick=()=>tab(2);
+$("dr").onchange=()=>{$("ds").value=$("dr").value==="y"?"l":"t";pv()};$("dc2").onchange=$("ds").onchange=pv;
+
+/* ---------- ventana con títulos al pasar por un autor o subgénero ---------- */
+let popRow=null;
+function showPop(row){if(popRow)popRow.classList.remove("act");popRow=row;row.classList.add("act");
+ const f=row.dataset.f,k=row.dataset.k,l=all().filter(b=>b[f]===k).sort((x,y)=>String(x.d||x.y).localeCompare(String(y.d||y.y))),p=$("pop");
+ p.innerHTML=`<b>${esc(k)} · ${l.length} libro${l.length>1?"s":""}</b>`+l.map(b=>`<div>${esc(b.t)}${f==="s"?` <i style="color:var(--mut)">${esc(b.a)}</i>`:""}<span>${b.d?fmt(b.d):b.y||""}</span></div>`).join("");
+ p.hidden=false;const r=row.getBoundingClientRect(),w=p.offsetWidth,h=p.offsetHeight;
+ p.style.left=Math.max(8,Math.min(r.left+r.width*.3,innerWidth-w-8))+"px";
+ p.style.top=(r.bottom+6+h<innerHeight?r.bottom+6:Math.max(8,r.top-h-6))+"px"}
+function hidePop(){$("pop").hidden=true;if(popRow)popRow.classList.remove("act");popRow=null}
+const canHover=matchMedia("(hover:hover)").matches;
+document.addEventListener("mouseover",e=>{if(!canHover)return;const row=e.target.closest(".hb[data-f]");if(row){if(row!==popRow)showPop(row)}else if(popRow&&!e.target.closest("#pop"))hidePop()});
+document.addEventListener("click",e=>{const row=e.target.closest(".hb[data-f]");if(row){row===popRow&&!canHover?hidePop():showPop(row)}else if(!e.target.closest("#pop"))hidePop()});
+addEventListener("scroll",()=>{if(!canHover)hidePop()},{passive:true});
+
+/* ---------- completar ISBN de los libros que ya estaban ---------- */
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const nd=d=>!d?"":/^\d{4}$/.test(d)?d+"-01-01":/^\d{4}-\d{2}$/.test(d)?d+"-01":d.slice(0,10);
+const sameT=(a,b)=>{a=nrm(a);b=nrm(b);return!!a&&!!b&&(a===b||a.startsWith(b+" ")||b.startsWith(a+" "))};
+async function guessIsbn(b){
+ const tt=b.t.split(/[.:(]/)[0].trim(),aut=/revisar|varios|^ed\.|\(ed|\(comp/i.test(b.a)?"":b.a.split(/&| y | con |,/)[0].trim(),last=aut.split(" ").pop()||"";
+ const q="intitle:"+tt+(last?" inauthor:"+last:"");
+ const g=await getJSON("https://www.googleapis.com/books/v1/volumes?maxResults=40&printType=books&q="+encodeURIComponent(q));
+ const lim=b.d||(b.y?b.y+"-12-31":"9999-12-31");let best=null;
+ for(const it of(g&&g.items)||[]){const v=it.volumeInfo||{};
+  if(!sameT(v.title,tt))continue;
+  if(last&&!(v.authors||[]).some(a=>nrm(a).includes(nrm(last))))continue;
+  let i="";for(const x of v.industryIdentifiers||[]){const c=toIsbn(x.identifier);if(c&&(x.type==="ISBN_13"||!i))i=c}
+  if(!i)continue;const pd=nd(v.publishedDate),antes=!!pd&&pd<=lim;
+  if(!antes&&!(pd&&pd.slice(0,4)<=String(+lim.slice(0,4)+1)))continue; // fechas de Google a veces atrasan un año
+  if(!best||(antes&&(!best.antes||pd>best.pd))||(!antes&&!best.antes&&pd<best.pd))best={i,pd,antes}}
+ return best?best.i:""}
+let fiRun=false;
+$("fi").onclick=async()=>{if(fiRun){fiRun=false;return}
+ const todo=books.filter(b=>!b.i);if(!todo.length){$("fis").textContent="Todos los libros ya tienen ISBN.";return}
+ fiRun=true;$("fi").textContent="Detener";let ok=0,no=0,lote=[];
+ const guardar=async()=>{if(!lote.length)return;const l=lote;lote=[];try{setBooks(await api({action:"isbn",list:l}))}catch(e){no+=l.length;ok-=l.length}};
+ for(let n=0;n<todo.length&&fiRun;n++){const b=todo[n];$("fis").textContent=`Buscando ${n+1} de ${todo.length} · encontrados ${ok}`;
+  const i=await guessIsbn(b);if(i){lote.push({c:b.c,i});ok++}else no++;
+  if(lote.length>=20)await guardar();await sleep(400)}
+ await guardar();const corto=fiRun?"":" (detenido; podés seguir después)";fiRun=false;$("fi").textContent="Completar ISBN faltantes";
+ $("fis").textContent=`Listo${corto}: ${ok} ISBN cargados, ${no} sin encontrar. Los que falten podés escanearlos o cargarlos en la planilla.`};
+
+/* ---------- arranque ---------- */
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&cfg&&Date.now()-store.get("at",0)>60000)load()});
+window.addEventListener("online",load);
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+showApp();
+/* ---------- código de barras e ISBN ---------- */
+const GEN={"Novela":"Ficción","Policial y suspenso":"Ficción","Novela histórica":"Ficción","Cuentos":"Ficción","Guion y teatro":"Ficción",
+ "Memorias y autobiografía":"No ficción","Biografía":"No ficción","Crónica y periodismo":"No ficción","Literatura de viajes":"No ficción","Historia":"No ficción",
+ "Política y actualidad":"No ficción","Ensayo":"No ficción","Deportes":"No ficción","Montañismo":"No ficción","Divulgación, negocios y autoayuda":"No ficción"};
+// Acepta ISBN-13 (978/979) o ISBN-10 y devuelve siempre el ISBN-13 válido, o "" si no lo es.
+function toIsbn(raw){let s=String(raw||"").toUpperCase().replace(/[^0-9X]/g,"");
+ if(s.length===10){let t=0;for(let i=0;i<10;i++){const v=s[i]==="X"?10:+s[i];if(isNaN(v)||(s[i]==="X"&&i<9))return"";t+=v*(10-i)}if(t%11)return"";s="978"+s.slice(0,9);s+=ck13(s);return s}
+ if(s.length===13&&/^97[89]\d{10}$/.test(s)&&ck13(s.slice(0,12))===s[12])return s;return""}
+function ck13(d){let t=0;for(let i=0;i<12;i++)t+=(+d[i])*(i%2?3:1);return String((10-t%10)%10)}
+
+// Sugerencia de subgénero a partir de las categorías que devuelven Google Books / Open Library.
+function suggest(cats){const c=(cats||[]).join(" | ").toLowerCase();if(!c)return"";
+ const R=[[/mountaineer|climbing|monta[ñn]ismo|alpinism/,"Montañismo"],[/sport|deporte|f[úu]tbol|soccer|basketball/,"Deportes"],
+  [/mystery|detective|thriller|crime fiction|suspense|polic/,"Policial y suspenso"],[/historical fiction|novela hist/,"Novela histórica"],
+  [/short stor|cuento|relatos/,"Cuentos"],[/drama|screenplay|teatro|gui[óo]n/,"Guion y teatro"],
+  [/memoir|autobiograph|memorias/,"Memorias y autobiografía"],[/biograph/,"Biografía"],[/travel|viaje/,"Literatura de viajes"],
+  [/true crime|journalism|periodismo|cr[óo]nica|reportage/,"Crónica y periodismo"],[/political|politic|current events/,"Política y actualidad"],
+  [/history|historia/,"Historia"],[/self-help|business|economics|science|psycholog|autoayuda|negocios|divulgaci/,"Divulgación, negocios y autoayuda"],
+  [/philosoph|essay|literary criticism|ensayo|social science/,"Ensayo"],[/fiction|ficci[óo]n|novel/,"Novela"]];
+ for(const[re,v]of R)if(re.test(c))return v;return""}
+
+async function getJSON(u,ms=8000){const ac=new AbortController(),t=setTimeout(()=>ac.abort(),ms);
+ try{const r=await fetch(u,{signal:ac.signal});return r.ok?await r.json():null}catch(e){return null}finally{clearTimeout(t)}}
+async function lookup(isbn){
+ const g=await getJSON("https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn);
+ const v=g&&g.items&&g.items[0]&&g.items[0].volumeInfo;
+ if(v&&v.title)return{t:v.title,a:(v.authors||[]).join(" & "),cats:v.categories||[],src:"Google Books"};
+ const o=await getJSON("https://openlibrary.org/api/books?format=json&jscmd=data&bibkeys=ISBN:"+isbn);
+ const b=o&&o["ISBN:"+isbn];
+ if(b&&b.title)return{t:b.title,a:(b.authors||[]).map(x=>x.name).join(" & "),cats:(b.subjects||[]).map(x=>x.name||x),src:"Open Library"};
+ return null}
+
+// Lectura del código: en vivo con la cámara si el navegador lo permite (Android/Chrome); si no, con una foto (iPhone).
+let scanMode="add",stream=null,loop=null;
+const hasLive=()=>"BarcodeDetector" in window&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia;
+async function startScan(mode){scanMode=mode;
+ if(hasLive()){try{const fm=await BarcodeDetector.getSupportedFormats();if(!fm.includes("ean_13"))throw 0;
+   stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
+   const v=$("sv");v.srcObject=stream;await v.play();$("sc").hidden=false;$("sm").textContent="Apuntá al código de barras de la contratapa";
+   const det=new BarcodeDetector({formats:["ean_13"]});
+   loop=setInterval(async()=>{try{const r=await det.detect(v);for(const c of r){const i=toIsbn(c.rawValue);if(i){stopScan();found(i);return}}}catch(e){}},250);
+   return}catch(e){stopScan()}}
+ $("sf").value="";$("sf").click()}
+function stopScan(){clearInterval(loop);loop=null;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$("sc").hidden=true}
+$("scx").onclick=stopScan;
+$("sph").onclick=()=>{stopScan();$("sf").value="";$("sf").click()};
+$("sf").onchange=async()=>{const f=$("sf").files[0];if(!f)return;toast("Leyendo el código…");
+ const i=await decodePhoto(f);if(i)found(i);else toast("No pude leer el código. Probá con más luz y el código derecho, o escribí el ISBN.",true)};
+
+async function decodePhoto(file){
+ const img=await new Promise((ok,ko)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>ok(im);im.onerror=ko;im.src=u}).catch(()=>null);
+ if(!img)return"";
+ if("BarcodeDetector" in window){try{const r=await new BarcodeDetector({formats:["ean_13"]}).detect(img);for(const c of r){const i=toIsbn(c.rawValue);if(i)return i}}catch(e){}}
+ const Z=await zxing();if(!Z)return"";
+ const hints=new Map();hints.set(Z.DecodeHintType.POSSIBLE_FORMATS,[Z.BarcodeFormat.EAN_13]);hints.set(Z.DecodeHintType.TRY_HARDER,true);
+ const rd=new Z.MultiFormatReader();rd.setHints(hints);
+ for(const max of[1600,1000,2400])for(const rot of[0,90]){
+  const sc=Math.min(1,max/Math.max(img.width,img.height)),w=Math.round(img.width*sc),h=Math.round(img.height*sc);
+  const cv=document.createElement("canvas"),cx=cv.getContext("2d");
+  if(rot){cv.width=h;cv.height=w;cx.translate(h,0);cx.rotate(Math.PI/2)}else{cv.width=w;cv.height=h}
+  cx.drawImage(img,0,0,w,h);const d=cx.getImageData(0,0,cv.width,cv.height).data,lum=new Uint8ClampedArray(cv.width*cv.height);
+  for(let p=0,q=0;q<lum.length;p+=4,q++)lum[q]=(d[p]*299+d[p+1]*587+d[p+2]*114)/1000;
+  try{const r=rd.decode(new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.RGBLuminanceSource(lum,cv.width,cv.height))));const i=toIsbn(r.getText());if(i)return i}catch(e){}
+ }return""}
+let zx=null;
+function zxing(){if(window.ZXing)return Promise.resolve(window.ZXing);if(zx)return zx;
+ const urls=["https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js","https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"];
+ zx=urls.reduce((p,u)=>p.then(Z=>Z||new Promise(ok=>{const s=document.createElement("script");s.src=u;s.onload=()=>ok(window.ZXing||null);s.onerror=()=>ok(null);document.head.appendChild(s)})),Promise.resolve(null));
+ return zx}
+
+// Qué hacer con el ISBN leído.
+// search: solo consulta (librería). add: agrega o completa. shelf: completar mis libros uno tras otro.
+async function found(isbn){
+ const ya=books.find(b=>b.i===isbn);
+ if(scanMode==="search"){
+  if(ya){$("q").value=ya.t;search();return}
+  toast("Buscando el libro…");const m=await lookup(isbn);
+  if(!m){$("q").value="";search();toast("No encontré datos para ese ISBN ("+isbn+"). Buscalo por título.",true);return}
+  $("toast").hidden=true;$("q").value=m.t;search();return}
+ if(ya&&!mk(ya.c).split(",").includes("6")){
+  if(scanMode==="shelf"){showDone(ya,"ya estaba completo");return}
+  openAdd("");$("ni").value=isbn;info("⚠ Ya está en tu lista: N° "+ya.c+", "+ya.t+".");return}
+ toast("Buscando datos…");const m=ya?{t:ya.t,a:ya.a,cats:[],src:""}:await lookup(isbn);$("toast").hidden=true;
+ const c=ya?[ya]:m?matchBooks(m):[];
+ if(c.length){showMatch(isbn,m,c);return}
+ if(scanMode==="shelf"&&!m){showNone(isbn);return}
+ openAdd("");$("ni").value=isbn;prefill(isbn,m)}
+function matchBooks(m){const main=t=>String(t).split(/[.:(]/)[0];
+ const last=nrm(String(m.a||"").split(/&|,/)[0].trim().split(" ").pop()||"");
+ return all().filter(b=>sameT(b.t,m.t)||sameT(main(b.t),main(m.t))).filter(b=>!last||nrm(b.a).includes(last)||/revisar|varios|\(comp|\(ed/i.test(b.a))}
+function showMatch(isbn,m,c){const p=$("mp");$("ap").hidden=true;$("sp").hidden=true;
+ const opts=c.map(b=>`<option value="${b.c}">N° ${b.c} · ${esc(b.t)}</option>`).join("");
+ p.innerHTML=`<h2>Es un libro de tu lista</h2>${c.length>1?`<select id="mpc">${opts}</select>`:""}<div id="mpb"></div>
+ <div class="row" style="margin-top:10px"><button type="button" id="mpno">No es este</button><button type="button" id="mpok" class="pri">Guardar</button></div>`;
+ p.hidden=false;window.scrollTo(0,0);
+ const draw1=()=>{const b=books.find(x=>x.c===+(($("mpc")||{}).value||c[0].c)),mks=mk(b.c).split(","),estS=mks.includes("4")||mks.includes("5"),sug=m?suggest(m.cats):"";
+  const isb=b.i===isbn?"ya cargado":b.i?`${b.i}${mks.includes("6")?" (estimado)":""} → se reemplaza por ${isbn}`:`vacío → se guarda ${isbn}`;
+  $("mpb").innerHTML=`<p style="margin:6px 0"><b>N° ${b.c} · ${esc(b.t)}</b><br><span class="stats">${esc(b.a)} · ${b.d?"leído el "+fmt(b.d):b.y||"sin fecha"}</span></p>
+  <p class="stats" style="margin:4px 0">ISBN: ${isb}</p>`+(estS?`<label style="display:block;margin:8px 0 4px">Subgénero (estaba estimado; al guardar queda confirmado)</label><select id="mps">${$("ns").innerHTML}</select>${sug&&sug!==b.s?`<p class="stats" style="margin:4px 0">Google Books sugiere: ${esc(sug)}. Antes estaba: ${esc(b.s)}.</p>`:""}`:"");
+  if(estS)$("mps").value=sug||b.s;
+  $("mpok").textContent="Guardar en N° "+b.c;$("mpok").onclick=()=>saveMatch(b,isbn,estS)};
+ draw1();if($("mpc"))$("mpc").onchange=draw1;
+ $("mpno").onclick=()=>{p.hidden=true;openAdd("");$("ni").value=isbn;prefill(isbn,m)}}
+async function saveMatch(b,isbn,estS){const body={action:"update",c:b.c,i:isbn,unmark:["6"]};
+ if(estS){body.s=$("mps").value;body.g=GEN[body.s]||b.g;body.unmark.push("4","5")}
+ $("mpok").disabled=true;$("mpok").textContent="Guardando…";
+ try{setBooks(await api(body));showDone(books.find(x=>x.c===b.c)||b,"completado")}
+ catch(e){toast("No se pudo guardar. Probá de nuevo.",true);$("mpok").disabled=false;$("mpok").textContent="Guardar en N° "+b.c}}
+function showDone(b,txt){const p=$("mp");p.innerHTML=`<h2>✔ N° ${b.c} ${txt}</h2><p style="margin:6px 0">${esc(b.t)} · <span class="stats">${esc(b.a)}</span></p>
+ <div class="row"><button type="button" id="mpx">Listo</button><button type="button" id="mpn" class="pri">📷 Escanear el siguiente</button></div>`;p.hidden=false;
+ $("mpx").onclick=()=>p.hidden=true;$("mpn").onclick=()=>startScan(scanMode==="search"?"add":scanMode)}
+function showNone(isbn){const p=$("mp");p.innerHTML=`<h2>No lo encontré</h2><p class="stats">No hay datos para el ISBN ${isbn} y no pude saber cuál de tus libros es. Buscalo en la tabla y cargá el ISBN en la planilla, o agregalo como libro nuevo.</p>
+ <div class="row"><button type="button" id="mpx">Cerrar</button><button type="button" id="mpn" class="pri">📷 Escanear el siguiente</button></div>`;p.hidden=false;
+ $("mpx").onclick=()=>p.hidden=true;$("mpn").onclick=()=>startScan("shelf")}
+async function fill(isbn){info("Buscando datos del ISBN "+isbn+"…");prefill(isbn,await lookup(isbn))}
+function prefill(isbn,m){
+ if(!m){info("No encontré datos para ese ISBN. Completalo a mano.");$("nt").focus();return}
+ $("nt").value=m.t;$("na").value=m.a;const s=suggest(m.cats);if(s)$("ns").value=s;
+ const dup=all().find(b=>nrm(b.t)===nrm(m.t));
+ info(dup?"⚠ Ojo: ya tenés uno con ese título (N° "+dup.c+"). Revisá antes de guardar.":(m.src?"Datos de "+m.src:"Datos cargados")+(s?", subgénero sugerido":"")+". Revisalos antes de guardar.")}
+function info(t){$("sinfo").textContent=t;$("sinfo").hidden=false}
+$("sq").onclick=()=>startScan("search");
+$("fs").onclick=()=>{$("sp").hidden=true;startScan("shelf")};
+$("sa").onclick=()=>startScan("add");
+$("nb").onclick=()=>{const i=toIsbn($("ni").value);if(!i){info("Ese ISBN no es válido. Revisá los números.");return}$("ni").value=i;fill(i)};
+
+</script></body></html>
